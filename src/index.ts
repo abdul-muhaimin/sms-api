@@ -15,6 +15,7 @@ import path from "path";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`🚀 API Server running on port ${PORT}`));
 
 // Add this before your API routes
 app.get("/", (_, res) => {
