@@ -72,7 +72,11 @@ async function processJob(job: Job<SmsJobData>): Promise<void> {
 }
 
 const worker = new Worker<SmsJobData>("sms-jobs", processJob, {
-  connection: redisConfig,
+  connection: {
+    ...redisConfig,
+    maxRetriesPerRequest: null,
+    enableReadyCheck: false,
+  },
   concurrency: 10,
   limiter: {
     max: 100,
@@ -142,13 +146,14 @@ process.on("SIGTERM", async () => {
   process.exit(0);
 });
 
-
 // HTTP server so Railway doesn't kill the process
-import http from 'http';
+import http from "http";
 
-http.createServer((_, res) => {
-  res.writeHead(200);
-  res.end('ok');
-}).listen(process.env.PORT || 8080);
+http
+  .createServer((_, res) => {
+    res.writeHead(200);
+    res.end("ok");
+  })
+  .listen(process.env.PORT || 8080);
 
-console.log('🚀 SMS Worker running...');
+console.log("🚀 SMS Worker running...");
