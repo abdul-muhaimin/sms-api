@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  apiKey        String   @unique
+  creditBalance Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  contacts      Contact[]
+  groups        Group[]
+  campaigns     Campaign[]
+  creditLedger  CreditLedger[]
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String?
+  phone     String
+  notes     String?
+  optedOut  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant  Tenant        @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  groups  GroupContact[]
+
+  @@unique([tenantId, phone])
+  @@index([tenantId])
+}
+
+model Group {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenant    Tenant         @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  contacts  GroupContact[]
+  campaigns Campaign[]
+
+  @@index([tenantId])
+}
+
+model GroupContact {
+  groupId   String
+  contactId String
+  addedAt   DateTime @default(now())
+
+  group   Group   @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([groupId, contactId])
+}
+
+model Campaign {
+  id            String         @id @default(cuid())
+  tenantId      String
+  groupId       String
+  name          String
+  message       String
+  status        CampaignStatus @default(PENDING)
+  totalMessages Int            @default(0)
+  sentCount     Int            @default(0)
+  failedCount   Int            @default(0)
+  creditsUsed   Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  completedAt   DateTime?
+
+  tenant   Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  group    Group     @relation(fields: [groupId], references: [id])
+  messages Message[]
+
+  @@index([tenantId])
+}
+
+model Message {
+  id           String        @id @default(cuid())
+  campaignId   String
+  phone        String
+  status       MessageStatus @default(QUEUED)
+  twilioSid    String?
+  errorCode    String?
+  errorMessage String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@index([twilioSid])
+}
+
+model CreditLedger {
+  id        String      @id @default(cuid())
+  tenantId  String
+  amount    Int
+  type      LedgerType
+  reason    String
+  createdAt DateTime    @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+enum CampaignStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum MessageStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  FAILED
+  UNDELIVERED
+}
+
+enum LedgerType {
+  CREDIT
+  DEBIT
+  REFUND
+}

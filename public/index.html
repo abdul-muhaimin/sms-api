@@ -1,0 +1,2584 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SMSaaS — API Console</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --brand-dark: #032d60;
+        --brand: #0176d3;
+        --brand-light: #1b96ff;
+        --brand-lighter: #d8edff;
+        --brand-bg: #eef4ff;
+
+        --neutral-100: #ffffff;
+        --neutral-200: #f3f3f3;
+        --neutral-300: #e5e5e5;
+        --neutral-400: #c9c9c9;
+        --neutral-500: #939393;
+        --neutral-600: #5c5c5c;
+        --neutral-700: #3e3e3c;
+        --neutral-800: #181818;
+
+        --green: #2e844a;
+        --green-bg: #edfaf4;
+        --red: #ba0517;
+        --red-bg: #fef1ee;
+        --yellow: #a96404;
+        --yellow-bg: #fef7ec;
+
+        --sidebar-width: 256px;
+        --topbar-height: 56px;
+
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.07);
+        --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.09);
+
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+
+        --font: "Plus Jakarta Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", "Courier New", monospace;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        font-size: 15px;
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--neutral-200);
+        color: var(--neutral-700);
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ── TOPBAR ── */
+      .topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--topbar-height);
+        background: var(--brand-dark);
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        gap: 16px;
+        z-index: 100;
+        box-shadow: var(--shadow-md);
+      }
+
+      .topbar-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        flex-shrink: 0;
+      }
+
+      .topbar-icon {
+        width: 30px;
+        height: 30px;
+        background: var(--brand-light);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+      }
+
+      .topbar-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: white;
+        letter-spacing: -0.2px;
+      }
+
+      .topbar-product {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.45);
+        border-left: 1px solid rgba(255, 255, 255, 0.15);
+        padding-left: 14px;
+        margin-left: 2px;
+      }
+
+      .topbar-url-wrap {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        flex: 1;
+        max-width: 420px;
+      }
+
+      .topbar-url-label {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.8px;
+        padding: 0 12px;
+        white-space: nowrap;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+        text-transform: uppercase;
+      }
+
+      .topbar-url-input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: var(--brand-light);
+        font-family: var(--mono);
+        font-size: 13px;
+        padding: 9px 14px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .topbar-url-input::placeholder {
+        color: rgba(255, 255, 255, 0.25);
+      }
+
+      .topbar-nav {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: auto;
+      }
+
+      .topbar-link {
+        color: rgba(255, 255, 255, 0.65);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 6px 12px;
+        border-radius: var(--radius-sm);
+        transition: all 0.12s;
+        white-space: nowrap;
+      }
+
+      .topbar-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+      .topbar-link.active {
+        background: var(--brand-light);
+        color: white;
+      }
+
+      /* ── LAYOUT ── */
+      .layout {
+        display: flex;
+        padding-top: var(--topbar-height);
+        min-height: 100vh;
+      }
+
+      /* ── SIDEBAR ── */
+      .sidebar {
+        width: var(--sidebar-width);
+        background: var(--neutral-100);
+        border-right: 1px solid var(--neutral-300);
+        position: fixed;
+        top: var(--topbar-height);
+        left: 0;
+        bottom: 0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar::-webkit-scrollbar {
+        width: 4px;
+      }
+      .sidebar::-webkit-scrollbar-thumb {
+        background: var(--neutral-400);
+        border-radius: 4px;
+      }
+
+      .sidebar-body {
+        flex: 1;
+        padding: 20px 0 12px;
+      }
+
+      .nav-section-title {
+        font-size: 10.5px;
+        font-weight: 700;
+        color: var(--neutral-500);
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        padding: 10px 18px 5px;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 8px 18px;
+        font-size: 13.5px;
+        color: var(--neutral-600);
+        cursor: pointer;
+        border-left: 3px solid transparent;
+        transition: all 0.1s;
+        user-select: none;
+      }
+
+      .nav-item:hover {
+        background: var(--neutral-200);
+        color: var(--neutral-800);
+      }
+
+      .nav-item.active {
+        background: var(--brand-bg);
+        color: var(--brand);
+        border-left-color: var(--brand);
+        font-weight: 600;
+      }
+
+      .nav-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--neutral-400);
+        flex-shrink: 0;
+      }
+      .nav-item.active .nav-dot {
+        background: var(--brand);
+      }
+
+      .nav-badge {
+        font-family: var(--mono);
+        font-size: 9px;
+        padding: 2px 7px;
+        border-radius: 20px;
+        font-weight: 600;
+        margin-left: auto;
+      }
+      .nb-get {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+      }
+      .nb-post {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+      }
+      .nb-admin {
+        background: #f5f3ff;
+        color: #6d28d9;
+        border: 1px solid #ddd6fe;
+      }
+
+      .nav-divider {
+        height: 1px;
+        background: var(--neutral-300);
+        margin: 10px 18px;
+      }
+
+      /* Server status bar at bottom of sidebar */
+      .sidebar-status {
+        border-top: 1px solid var(--neutral-300);
+        padding: 14px 18px;
+        background: var(--neutral-200);
+      }
+
+      .status-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--neutral-600);
+        margin-bottom: 3px;
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .status-dot.online {
+        background: var(--green);
+        box-shadow: 0 0 0 2px #bbf7d0;
+        animation: blink 2s infinite;
+      }
+      .status-dot.offline {
+        background: var(--red);
+        box-shadow: 0 0 0 2px #fca5a5;
+      }
+      .status-dot.unknown {
+        background: var(--neutral-400);
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .status-ts {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--neutral-500);
+      }
+
+      /* ── MAIN ── */
+      .main {
+        margin-left: var(--sidebar-width);
+        flex: 1;
+        min-height: calc(100vh - var(--topbar-height));
+        background: var(--neutral-100);
+      }
+
+      /* ── PANEL ── */
+      .panel {
+        display: none;
+        padding: 32px 36px;
+        max-width: 900px;
+        animation: fadeUp 0.18s ease;
+      }
+      .panel.active {
+        display: block;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .panel-header {
+        margin-bottom: 28px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid var(--neutral-300);
+      }
+
+      .panel-eyebrow {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--brand);
+        margin-bottom: 6px;
+      }
+
+      .panel-title {
+        font-size: 26px;
+        font-weight: 800;
+        color: var(--neutral-800);
+        letter-spacing: -0.4px;
+        margin-bottom: 6px;
+      }
+
+      .panel-desc {
+        font-size: 14px;
+        color: var(--neutral-500);
+      }
+
+      /* ── HEALTH GRID ── */
+      .health-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+
+      .info-card {
+        background: var(--neutral-100);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+      }
+
+      .info-card-title {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: var(--neutral-500);
+        margin-bottom: 14px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--neutral-200);
+        font-size: 13px;
+      }
+
+      .info-row:last-child {
+        border-bottom: none;
+      }
+      .info-key {
+        color: var(--neutral-500);
+      }
+      .info-val {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--neutral-700);
+        font-weight: 500;
+      }
+      .info-val.ok {
+        color: var(--green);
+      }
+      .info-val.err {
+        color: var(--red);
+      }
+
+      /* Quick test buttons */
+      .quick-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 10px 14px;
+        background: var(--neutral-200);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        font-family: var(--font);
+        font-size: 13px;
+        color: var(--neutral-600);
+        text-align: left;
+        transition: all 0.12s;
+        margin-bottom: 8px;
+      }
+      .quick-btn:hover {
+        background: var(--brand-bg);
+        border-color: var(--brand-lighter);
+        color: var(--brand);
+      }
+      .quick-btn:last-child {
+        margin-bottom: 0;
+      }
+      .quick-btn-method {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      /* ── STATS GRID ── */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+      }
+
+      .stat-card {
+        background: var(--neutral-100);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+      }
+      .stat-card:hover {
+        border-color: var(--brand-lighter);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .stat-label {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: var(--neutral-500);
+        margin-bottom: 10px;
+      }
+
+      .stat-value {
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--neutral-800);
+        letter-spacing: -1px;
+        line-height: 1;
+      }
+      .stat-value.blue {
+        color: var(--brand);
+      }
+      .stat-value.green {
+        color: var(--green);
+      }
+
+      /* ── API KEY BAR ── */
+      .api-key-bar {
+        display: flex;
+        align-items: flex-end;
+        gap: 12px;
+        margin-bottom: 24px;
+        padding: 16px 20px;
+        background: var(--brand-bg);
+        border: 1px solid var(--brand-lighter);
+        border-radius: var(--radius-lg);
+      }
+
+      .api-key-bar label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        color: var(--brand);
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      /* ── REQUEST BLOCK ── */
+      .request-block {
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin-bottom: 16px;
+        background: var(--neutral-100);
+      }
+
+      .request-block-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 18px;
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.1s;
+      }
+      .request-block-header:hover {
+        background: var(--neutral-200);
+      }
+      .request-block.open .request-block-header {
+        background: var(--brand-bg);
+        border-bottom: 1px solid var(--brand-lighter);
+      }
+
+      .method-tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: var(--radius-sm);
+        flex-shrink: 0;
+        letter-spacing: 0.3px;
+      }
+      .tag-get {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+      }
+      .tag-post {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+      }
+      .tag-delete {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+      }
+      .tag-patch {
+        background: #fffbeb;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+
+      .endpoint-path {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--neutral-700);
+        font-weight: 500;
+        flex: 1;
+      }
+      .request-block.open .endpoint-path {
+        color: var(--brand-dark);
+      }
+
+      .endpoint-desc {
+        font-size: 12px;
+        color: var(--neutral-500);
+      }
+
+      .chevron {
+        font-size: 11px;
+        color: var(--neutral-400);
+        transition: transform 0.18s;
+      }
+      .request-block.open .chevron {
+        transform: rotate(90deg);
+      }
+
+      .request-block-body {
+        display: none;
+        padding: 20px;
+      }
+      .request-block.open .request-block-body {
+        display: block;
+      }
+
+      /* ── FORMS ── */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .form-grid.cols-1 {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .form-group.span-2 {
+        grid-column: 1 / -1;
+      }
+
+      .form-group label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        color: var(--neutral-500);
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="number"],
+      input[type="password"],
+      textarea,
+      select {
+        font-family: var(--font);
+        font-size: 13.5px;
+        color: var(--neutral-800);
+        background: var(--neutral-100);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-md);
+        padding: 9px 12px;
+        outline: none;
+        transition:
+          border-color 0.12s,
+          box-shadow 0.12s;
+        width: 100%;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(1, 118, 211, 0.12);
+      }
+
+      input[type="password"] {
+        font-family: var(--mono);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 84px;
+        font-family: var(--font);
+        line-height: 1.5;
+      }
+
+      .char-hint {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--neutral-500);
+        margin-top: 4px;
+      }
+
+      .char-hint span {
+        color: var(--brand);
+        font-weight: 600;
+      }
+
+      .action-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 4px;
+      }
+
+      /* ── BUTTONS ── */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 9px 18px;
+        border-radius: var(--radius-md);
+        border: none;
+        cursor: pointer;
+        font-family: var(--font);
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.12s;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .btn-primary {
+        background: var(--brand);
+        color: white;
+        box-shadow: 0 1px 3px rgba(1, 118, 211, 0.3);
+      }
+      .btn-primary:hover {
+        background: var(--brand-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(1, 118, 211, 0.3);
+      }
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .btn-secondary {
+        background: var(--neutral-100);
+        color: var(--neutral-700);
+        border: 1px solid var(--neutral-300);
+      }
+      .btn-secondary:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+        background: var(--brand-bg);
+      }
+
+      .btn-danger {
+        background: var(--red-bg);
+        color: var(--red);
+        border: 1px solid #fca5a5;
+      }
+      .btn-danger:hover {
+        background: #fee2e2;
+      }
+
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+
+      /* ── RESPONSE BOX ── */
+      .response-box {
+        display: none;
+        margin-top: 16px;
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        background: var(--neutral-100);
+      }
+      .response-box.show {
+        display: block;
+      }
+
+      .response-topbar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 14px;
+        background: var(--neutral-200);
+        border-bottom: 1px solid var(--neutral-300);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+
+      .status-chip {
+        padding: 2px 9px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 11px;
+      }
+      .chip-2xx {
+        background: var(--green-bg);
+        color: var(--green);
+        border: 1px solid #a7f3d0;
+      }
+      .chip-4xx {
+        background: var(--red-bg);
+        color: var(--red);
+        border: 1px solid #fca5a5;
+      }
+      .chip-5xx {
+        background: var(--yellow-bg);
+        color: var(--yellow);
+        border: 1px solid #fde68a;
+      }
+
+      .response-time {
+        color: var(--neutral-500);
+      }
+
+      .response-copy {
+        margin-left: auto;
+        background: none;
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-sm);
+        padding: 2px 8px;
+        font-size: 10px;
+        font-family: var(--mono);
+        color: var(--neutral-500);
+        cursor: pointer;
+        transition: all 0.1s;
+      }
+      .response-copy:hover {
+        border-color: var(--brand);
+        color: var(--brand);
+        background: var(--brand-bg);
+      }
+
+      .response-pre {
+        padding: 16px;
+        font-family: var(--mono);
+        font-size: 12px;
+        line-height: 1.7;
+        overflow-x: auto;
+        max-height: 380px;
+        overflow-y: auto;
+        background: var(--brand-dark);
+        color: #a8d8ea;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+
+      .response-pre .jk {
+        color: #79b8ff;
+      }
+      .response-pre .js {
+        color: #85e89d;
+      }
+      .response-pre .jn {
+        color: #f97583;
+      }
+      .response-pre .jb {
+        color: #ffab70;
+      }
+      .response-pre .jnull {
+        color: #5a7a9a;
+      }
+
+      /* ── HEALTH RESPONSE (first show) ── */
+      .response-box.init-show {
+        display: block;
+      }
+
+      /* ── PROGRESS BAR ── */
+      .progress-container {
+        display: none;
+        margin-top: 16px;
+        padding: 16px;
+        background: var(--neutral-200);
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-md);
+      }
+
+      .progress-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+
+      .progress-status {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--neutral-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .progress-pct {
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--brand);
+      }
+
+      .progress-track {
+        height: 6px;
+        background: var(--neutral-300);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 12px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--brand-dark),
+          var(--brand-light)
+        );
+        border-radius: 4px;
+        width: 0%;
+        transition: width 0.5s ease;
+      }
+
+      .progress-stats {
+        display: flex;
+        gap: 20px;
+        font-size: 12px;
+        font-family: var(--mono);
+      }
+
+      .pstat {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .pstat-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .pstat-sent .pstat-dot {
+        background: var(--green);
+      }
+      .pstat-failed .pstat-dot {
+        background: var(--red);
+      }
+      .pstat-pending .pstat-dot {
+        background: var(--neutral-400);
+      }
+      .pstat-total .pstat-dot {
+        background: var(--brand);
+      }
+      .pstat-label {
+        color: var(--neutral-500);
+      }
+      .pstat-val {
+        color: var(--neutral-700);
+        font-weight: 600;
+      }
+
+      /* ── DOCS SECTION ── */
+      .docs-group {
+        border: 1px solid var(--neutral-300);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+
+      .docs-group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        background: var(--neutral-200);
+        border-bottom: 1px solid var(--neutral-300);
+      }
+
+      .docs-group-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--neutral-800);
+      }
+
+      .docs-auth-tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--yellow);
+        background: var(--yellow-bg);
+        border: 1px solid #fde68a;
+        padding: 2px 9px;
+        border-radius: var(--radius-sm);
+      }
+
+      .docs-auth-tag.tenant {
+        color: var(--brand);
+        background: var(--brand-bg);
+        border-color: var(--brand-lighter);
+      }
+
+      .docs-endpoint {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 18px;
+        border-bottom: 1px solid var(--neutral-200);
+        transition: background 0.1s;
+      }
+      .docs-endpoint:last-child {
+        border-bottom: none;
+      }
+      .docs-endpoint:hover {
+        background: var(--neutral-200);
+      }
+
+      .docs-info {
+        flex: 1;
+      }
+      .docs-path {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--neutral-700);
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+      .docs-desc {
+        font-size: 12.5px;
+        color: var(--neutral-500);
+        line-height: 1.5;
+      }
+
+      /* ── TOAST ── */
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--neutral-800);
+        color: white;
+        border-radius: var(--radius-md);
+        padding: 12px 18px;
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        transform: translateY(60px);
+        opacity: 0;
+        transition: all 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+        z-index: 9999;
+        max-width: 340px;
+        box-shadow: var(--shadow-md);
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast.success .toast-icon {
+        color: #4ade80;
+      }
+      .toast.error .toast-icon {
+        color: #f87171;
+      }
+      .toast-icon {
+        font-size: 15px;
+      }
+
+      /* ── SPINNER ── */
+      .spinner {
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top-color: white;
+        border-radius: 50%;
+        animation: spin 0.55s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width: 860px) {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .health-grid {
+          grid-template-columns: 1fr;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .stats-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .panel {
+          padding: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── TOPBAR ── -->
+    <header class="topbar">
+      <a href="#" class="topbar-logo">
+        <div class="topbar-icon">💬</div>
+        <span class="topbar-name">SMSaaS</span>
+      </a>
+      <span class="topbar-product">API Console</span>
+
+      <div class="topbar-url-wrap">
+        <span class="topbar-url-label">Base URL</span>
+        <input
+          type="text"
+          class="topbar-url-input"
+          id="baseUrl"
+          value="http://localhost:3001"
+          placeholder="http://localhost:3001"
+        />
+      </div>
+
+      <button class="btn btn-primary btn-sm" onclick="checkHealth()">
+        <span id="healthBtnText">Check Health</span>
+      </button>
+
+      <nav class="topbar-nav">
+        <a href="docs/index.html" class="topbar-link">Docs</a>
+        <a href="docs/brd.html" class="topbar-link">BRD</a>
+        <a href="docs/frd.html" class="topbar-link">FRD</a>
+        <a href="docs/api.html" class="topbar-link">API Ref</a>
+      </nav>
+    </header>
+
+    <div class="layout">
+      <!-- ── SIDEBAR ── -->
+      <aside class="sidebar">
+        <div class="sidebar-body">
+          <div class="nav-section-title">Overview</div>
+          <div class="nav-item active" onclick="show('health')">
+            <span class="nav-dot"></span> Health Check
+          </div>
+          <div class="nav-item" onclick="show('stats')">
+            <span class="nav-dot"></span> Platform Stats
+          </div>
+
+          <div class="nav-divider"></div>
+          <div class="nav-section-title">Admin</div>
+          <div class="nav-item" onclick="show('tenants')">
+            <span class="nav-dot"></span> Tenants
+            <span class="nav-badge nb-admin">ADMIN</span>
+          </div>
+
+          <div class="nav-divider"></div>
+          <div class="nav-section-title">Tenant API</div>
+          <div class="nav-item" onclick="show('contacts')">
+            <span class="nav-dot"></span> Contacts
+            <span class="nav-badge nb-get">GET</span>
+          </div>
+          <div class="nav-item" onclick="show('groups')">
+            <span class="nav-dot"></span> Groups
+            <span class="nav-badge nb-get">GET</span>
+          </div>
+          <div class="nav-item" onclick="show('campaigns')">
+            <span class="nav-dot"></span> Campaigns
+            <span class="nav-badge nb-post">POST</span>
+          </div>
+          <div class="nav-item" onclick="show('credits')">
+            <span class="nav-dot"></span> Credits
+            <span class="nav-badge nb-get">GET</span>
+          </div>
+
+          <div class="nav-divider"></div>
+          <div class="nav-section-title">Reference</div>
+          <div class="nav-item" onclick="show('apidocs')">
+            <span class="nav-dot"></span> API Reference
+          </div>
+        </div>
+
+        <div class="sidebar-status">
+          <div class="status-row">
+            <div class="status-dot unknown" id="statusDot"></div>
+            <span id="statusText" style="font-size: 12.5px; font-weight: 500"
+              >Not checked</span
+            >
+          </div>
+          <div class="status-ts" id="statusTs">—</div>
+        </div>
+      </aside>
+
+      <!-- ── MAIN ── -->
+      <main class="main">
+        <!-- HEALTH -->
+        <div class="panel active" id="panel-health">
+          <div class="panel-header">
+            <div class="panel-eyebrow">🟢 System</div>
+            <div class="panel-title">Server Health</div>
+            <div class="panel-desc">
+              Verify the API server, database, and Redis queue are all
+              reachable.
+            </div>
+          </div>
+
+          <div class="health-grid">
+            <div class="info-card">
+              <div class="info-card-title">Server Status</div>
+              <div class="info-row">
+                <span class="info-key">Status</span
+                ><span class="info-val" id="h-status">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-key">Timestamp</span
+                ><span class="info-val" id="h-ts">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-key">Response Time</span
+                ><span class="info-val" id="h-rt">—</span>
+              </div>
+              <div class="info-row">
+                <span class="info-key">Base URL</span
+                ><span
+                  class="info-val"
+                  id="h-url"
+                  style="font-size: 11px; word-break: break-all"
+                  >—</span
+                >
+              </div>
+            </div>
+            <div class="info-card">
+              <div class="info-card-title">Quick Tests</div>
+              <button class="quick-btn" onclick="checkHealth()">
+                <span
+                  class="quick-btn-method nb-get"
+                  style="
+                    background: #ecfdf5;
+                    color: #065f46;
+                    border: 1px solid #a7f3d0;
+                    padding: 2px 7px;
+                    border-radius: 4px;
+                  "
+                  >GET</span
+                >
+                /health
+              </button>
+              <button class="quick-btn" onclick="show('tenants')">
+                <span
+                  class="quick-btn-method nb-admin"
+                  style="
+                    background: #f5f3ff;
+                    color: #6d28d9;
+                    border: 1px solid #ddd6fe;
+                    padding: 2px 7px;
+                    border-radius: 4px;
+                  "
+                  >ADMIN</span
+                >
+                /admin/tenants
+              </button>
+              <button class="quick-btn" onclick="show('credits')">
+                <span
+                  class="quick-btn-method nb-get"
+                  style="
+                    background: #ecfdf5;
+                    color: #065f46;
+                    border: 1px solid #a7f3d0;
+                    padding: 2px 7px;
+                    border-radius: 4px;
+                  "
+                  >GET</span
+                >
+                /credits
+              </button>
+            </div>
+          </div>
+
+          <div class="response-box init-show" id="healthResponse">
+            <div class="response-topbar">
+              <span id="healthInitMsg" style="color: var(--neutral-500)"
+                >Click "Check Health" to test your server</span
+              >
+              <span
+                class="status-chip"
+                id="healthStatus"
+                style="display: none"
+              ></span>
+              <span class="response-time" id="healthTime"></span>
+            </div>
+            <div class="response-pre" id="healthBody" style="color: #546a7b">
+              // Response will appear here
+            </div>
+          </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="panel" id="panel-stats">
+          <div class="panel-header">
+            <div class="panel-eyebrow">📊 Overview</div>
+            <div class="panel-title">Platform Stats</div>
+            <div class="panel-desc">
+              Live statistics across all tenants. Requires admin secret.
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; margin-bottom: 24px">
+            <div style="flex: 1; max-width: 320px">
+              <div class="form-group">
+                <label>Admin Secret</label>
+                <input
+                  type="password"
+                  id="statsAdminSecret"
+                  placeholder="Enter admin secret"
+                />
+              </div>
+            </div>
+            <div style="display: flex; align-items: flex-end">
+              <button class="btn btn-primary" onclick="loadStats()">
+                Load Stats
+              </button>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Tenants</div>
+              <div class="stat-value blue" id="stat-tenants">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Active Tenants</div>
+              <div class="stat-value green" id="stat-active">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Total Contacts</div>
+              <div class="stat-value" id="stat-contacts">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Campaigns Run</div>
+              <div class="stat-value" id="stat-campaigns">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TENANTS -->
+        <div class="panel" id="panel-tenants">
+          <div class="panel-header">
+            <div class="panel-eyebrow">🏢 Admin</div>
+            <div class="panel-title">Tenant Management</div>
+            <div class="panel-desc">
+              Create and manage client accounts. All endpoints require admin
+              secret.
+            </div>
+          </div>
+
+          <!-- Create Tenant -->
+          <div class="request-block open" id="rb-create-tenant">
+            <div
+              class="request-block-header"
+              onclick="toggleBlock('rb-create-tenant')"
+            >
+              <span class="method-tag tag-post">POST</span>
+              <span class="endpoint-path">/api/v1/admin/tenants</span>
+              <span class="endpoint-desc">Create new tenant</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Admin Secret</label>
+                  <input
+                    type="password"
+                    id="adminSecret"
+                    placeholder="your_admin_secret"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Initial Credits</label>
+                  <input
+                    type="number"
+                    id="tenantCredits"
+                    value="1000"
+                    min="0"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Business Name</label>
+                  <input
+                    type="text"
+                    id="tenantName"
+                    placeholder="Reethi Cafe"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    id="tenantEmail"
+                    placeholder="admin@reethicafe.mv"
+                  />
+                </div>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="createTenant()">
+                  Create Tenant
+                </button>
+              </div>
+              <div class="response-box" id="createTenantResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="createTenantStatus"></span>
+                  <span class="response-time" id="createTenantTime"></span>
+                  <button
+                    class="response-copy"
+                    onclick="copyPre('createTenantBody')"
+                  >
+                    copy
+                  </button>
+                </div>
+                <div class="response-pre" id="createTenantBody"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- List Tenants -->
+          <div class="request-block" id="rb-list-tenants">
+            <div
+              class="request-block-header"
+              onclick="toggleBlock('rb-list-tenants')"
+            >
+              <span class="method-tag tag-get">GET</span>
+              <span class="endpoint-path">/api/v1/admin/tenants</span>
+              <span class="endpoint-desc">List all tenants</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="form-grid cols-1" style="max-width: 320px">
+                <div class="form-group">
+                  <label>Admin Secret</label>
+                  <input
+                    type="password"
+                    id="listAdminSecret"
+                    placeholder="your_admin_secret"
+                  />
+                </div>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="listTenants()">
+                  List Tenants
+                </button>
+              </div>
+              <div class="response-box" id="listTenantsResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="listTenantsStatus"></span>
+                  <span class="response-time" id="listTenantsTime"></span>
+                  <button
+                    class="response-copy"
+                    onclick="copyPre('listTenantsBody')"
+                  >
+                    copy
+                  </button>
+                </div>
+                <div class="response-pre" id="listTenantsBody"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Up -->
+          <div class="request-block" id="rb-topup">
+            <div class="request-block-header" onclick="toggleBlock('rb-topup')">
+              <span class="method-tag tag-post">POST</span>
+              <span class="endpoint-path"
+                >/api/v1/admin/tenants/:id/credits</span
+              >
+              <span class="endpoint-desc">Top up credits</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Admin Secret</label>
+                  <input
+                    type="password"
+                    id="topupSecret"
+                    placeholder="your_admin_secret"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Tenant ID</label>
+                  <input type="text" id="topupTenantId" placeholder="clx..." />
+                </div>
+                <div class="form-group">
+                  <label>Amount (credits)</label>
+                  <input type="number" id="topupAmount" value="500" min="1" />
+                </div>
+                <div class="form-group">
+                  <label>Reason</label>
+                  <input type="text" id="topupReason" value="Manual top-up" />
+                </div>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="topUpCredits()">
+                  Top Up Credits
+                </button>
+              </div>
+              <div class="response-box" id="topupResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="topupStatus"></span>
+                  <span class="response-time" id="topupTime"></span>
+                </div>
+                <div class="response-pre" id="topupBody"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTACTS -->
+        <div class="panel" id="panel-contacts">
+          <div class="panel-header">
+            <div class="panel-eyebrow">👤 Tenant API</div>
+            <div class="panel-title">Contacts</div>
+            <div class="panel-desc">Manage customer contacts for a tenant.</div>
+          </div>
+
+          <div class="api-key-bar">
+            <div class="form-group" style="flex: 1; max-width: 420px">
+              <label>Tenant API Key</label>
+              <input
+                type="text"
+                id="tenantApiKey"
+                placeholder="Paste tenant API key here"
+              />
+            </div>
+          </div>
+
+          <div class="request-block open" id="rb-list-contacts">
+            <div
+              class="request-block-header"
+              onclick="toggleBlock('rb-list-contacts')"
+            >
+              <span class="method-tag tag-get">GET</span>
+              <span class="endpoint-path">/api/v1/contacts</span>
+              <span class="endpoint-desc">List contacts</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Search (optional)</label>
+                  <input
+                    type="text"
+                    id="contactSearch"
+                    placeholder="Name or phone"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Page</label>
+                  <input type="number" id="contactPage" value="1" min="1" />
+                </div>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="listContacts()">
+                  List Contacts
+                </button>
+              </div>
+              <div class="response-box" id="listContactsResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="listContactsStatus"></span>
+                  <span class="response-time" id="listContactsTime"></span>
+                </div>
+                <div class="response-pre" id="listContactsBody"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="request-block" id="rb-create-contact">
+            <div
+              class="request-block-header"
+              onclick="toggleBlock('rb-create-contact')"
+            >
+              <span class="method-tag tag-post">POST</span>
+              <span class="endpoint-path">/api/v1/contacts</span>
+              <span class="endpoint-desc">Create contact</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Name</label>
+                  <input
+                    type="text"
+                    id="newContactName"
+                    placeholder="Ahmed Ali"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Phone (Maldivian)</label>
+                  <input
+                    type="text"
+                    id="newContactPhone"
+                    placeholder="+9607123456"
+                  />
+                </div>
+                <div class="form-group span-2">
+                  <label>Notes (optional)</label>
+                  <input
+                    type="text"
+                    id="newContactNotes"
+                    placeholder="VIP customer"
+                  />
+                </div>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="createContact()">
+                  Create Contact
+                </button>
+              </div>
+              <div class="response-box" id="createContactResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="createContactStatus"></span>
+                  <span class="response-time" id="createContactTime"></span>
+                </div>
+                <div class="response-pre" id="createContactBody"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GROUPS -->
+        <div class="panel" id="panel-groups">
+          <div class="panel-header">
+            <div class="panel-eyebrow">👥 Tenant API</div>
+            <div class="panel-title">Groups</div>
+            <div class="panel-desc">
+              Manage contact groups for targeted campaigns.
+            </div>
+          </div>
+
+          <div class="api-key-bar">
+            <div class="form-group" style="flex: 1; max-width: 420px">
+              <label>Tenant API Key</label>
+              <input
+                type="text"
+                id="groupsApiKey"
+                placeholder="Paste tenant API key here"
+              />
+            </div>
+          </div>
+
+          <div class="request-block open" id="rb-list-groups">
+            <div
+              class="request-block-header"
+              onclick="toggleBlock('rb-list-groups')"
+            >
+              <span class="method-tag tag-get">GET</span>
+              <span class="endpoint-path">/api/v1/groups</span>
+              <span class="endpoint-desc">List all groups</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="listGroups()">
+                  List Groups
+                </button>
+              </div>
+              <div class="response-box" id="listGroupsResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="listGroupsStatus"></span>
+                  <span class="response-time" id="listGroupsTime"></span>
+                </div>
+                <div class="response-pre" id="listGroupsBody"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="request-block" id="rb-create-group">
+            <div
+              class="request-block-header"
+              onclick="toggleBlock('rb-create-group')"
+            >
+              <span class="method-tag tag-post">POST</span>
+              <span class="endpoint-path">/api/v1/groups</span>
+              <span class="endpoint-desc">Create group</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="form-grid cols-1" style="max-width: 320px">
+                <div class="form-group">
+                  <label>Group Name</label>
+                  <input
+                    type="text"
+                    id="newGroupName"
+                    placeholder="VIP Customers"
+                  />
+                </div>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="createGroup()">
+                  Create Group
+                </button>
+              </div>
+              <div class="response-box" id="createGroupResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="createGroupStatus"></span>
+                  <span class="response-time" id="createGroupTime"></span>
+                </div>
+                <div class="response-pre" id="createGroupBody"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAMPAIGNS -->
+        <div class="panel" id="panel-campaigns">
+          <div class="panel-header">
+            <div class="panel-eyebrow">📣 Tenant API</div>
+            <div class="panel-title">Campaigns</div>
+            <div class="panel-desc">
+              Launch bulk SMS campaigns and track delivery in real time.
+            </div>
+          </div>
+
+          <div class="api-key-bar">
+            <div class="form-group" style="flex: 1; max-width: 420px">
+              <label>Tenant API Key</label>
+              <input
+                type="text"
+                id="campaignsApiKey"
+                placeholder="Paste tenant API key here"
+              />
+            </div>
+          </div>
+
+          <div class="request-block open" id="rb-send-campaign">
+            <div
+              class="request-block-header"
+              onclick="toggleBlock('rb-send-campaign')"
+            >
+              <span class="method-tag tag-post">POST</span>
+              <span class="endpoint-path">/api/v1/campaigns</span>
+              <span class="endpoint-desc">Launch bulk SMS campaign</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Campaign Name</label>
+                  <input
+                    type="text"
+                    id="campName"
+                    placeholder="Ramadan Promo"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Group ID</label>
+                  <input type="text" id="campGroupId" placeholder="clx..." />
+                </div>
+                <div class="form-group span-2">
+                  <label>Message</label>
+                  <textarea
+                    id="campMessage"
+                    placeholder="Hello! Special offer just for you..."
+                  ></textarea>
+                  <div class="char-hint">
+                    <span id="charCount">0</span>/160 chars —
+                    <span id="creditEst">1</span> credit per recipient
+                  </div>
+                </div>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="launchCampaign()">
+                  🚀 Launch Campaign
+                </button>
+              </div>
+              <div class="response-box" id="launchCampResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="launchCampStatus"></span>
+                  <span class="response-time" id="launchCampTime"></span>
+                </div>
+                <div class="response-pre" id="launchCampBody"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="request-block" id="rb-campaign-progress">
+            <div
+              class="request-block-header"
+              onclick="toggleBlock('rb-campaign-progress')"
+            >
+              <span class="method-tag tag-get">GET</span>
+              <span class="endpoint-path">/api/v1/campaigns/:id/progress</span>
+              <span class="endpoint-desc">Live campaign progress</span>
+              <span class="chevron">▶</span>
+            </div>
+            <div class="request-block-body">
+              <div class="form-grid cols-1" style="max-width: 320px">
+                <div class="form-group">
+                  <label>Campaign ID</label>
+                  <input type="text" id="progressCampId" placeholder="clx..." />
+                </div>
+              </div>
+              <div class="action-row">
+                <button class="btn btn-primary" onclick="getCampaignProgress()">
+                  Get Progress
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  id="pollBtn"
+                  onclick="togglePoll()"
+                >
+                  Start Polling
+                </button>
+              </div>
+
+              <div class="progress-container" id="progressContainer">
+                <div class="progress-header">
+                  <span class="progress-status" id="progressLabel"
+                    >Running</span
+                  >
+                  <span class="progress-pct" id="progressPct">0%</span>
+                </div>
+                <div class="progress-track">
+                  <div class="progress-fill" id="progressBar"></div>
+                </div>
+                <div class="progress-stats">
+                  <div class="pstat pstat-sent">
+                    <span class="pstat-dot"></span>
+                    <span class="pstat-label">Sent</span>
+                    <span class="pstat-val" id="sentCount">0</span>
+                  </div>
+                  <div class="pstat pstat-failed">
+                    <span class="pstat-dot"></span>
+                    <span class="pstat-label">Failed</span>
+                    <span class="pstat-val" id="failedCount">0</span>
+                  </div>
+                  <div class="pstat pstat-pending">
+                    <span class="pstat-dot"></span>
+                    <span class="pstat-label">Pending</span>
+                    <span class="pstat-val" id="pendingCount">0</span>
+                  </div>
+                  <div class="pstat pstat-total">
+                    <span class="pstat-dot"></span>
+                    <span class="pstat-label">Total</span>
+                    <span class="pstat-val" id="totalCount">0</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="response-box" id="progressResponse">
+                <div class="response-topbar">
+                  <span class="status-chip" id="progressStatus"></span>
+                  <span class="response-time" id="progressTime"></span>
+                </div>
+                <div class="response-pre" id="progressBody"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CREDITS -->
+        <div class="panel" id="panel-credits">
+          <div class="panel-header">
+            <div class="panel-eyebrow">💳 Tenant API</div>
+            <div class="panel-title">Credits</div>
+            <div class="panel-desc">
+              Check balance and view full transaction history.
+            </div>
+          </div>
+
+          <div class="api-key-bar">
+            <div class="form-group" style="flex: 1; max-width: 420px">
+              <label>Tenant API Key</label>
+              <input
+                type="text"
+                id="creditsApiKey"
+                placeholder="Paste tenant API key here"
+              />
+            </div>
+            <button
+              class="btn btn-primary"
+              onclick="getCredits()"
+              style="flex-shrink: 0"
+            >
+              Check Balance
+            </button>
+          </div>
+
+          <div class="response-box init-show" id="creditsResponse">
+            <div class="response-topbar">
+              <span id="creditsInitMsg" style="color: var(--neutral-500)"
+                >Enter API key and click Check Balance</span
+              >
+              <span
+                class="status-chip"
+                id="creditsStatus"
+                style="display: none"
+              ></span>
+              <span class="response-time" id="creditsTime"></span>
+            </div>
+            <div class="response-pre" id="creditsBody" style="color: #546a7b">
+              // Balance will appear here
+            </div>
+          </div>
+
+          <div style="margin-top: 14px">
+            <button class="btn btn-secondary" onclick="getLedger()">
+              View Transaction Ledger
+            </button>
+          </div>
+
+          <div
+            class="response-box"
+            id="ledgerResponse"
+            style="margin-top: 12px"
+          >
+            <div class="response-topbar">
+              <span class="status-chip" id="ledgerStatus"></span>
+              <span class="response-time" id="ledgerTime"></span>
+            </div>
+            <div class="response-pre" id="ledgerBody"></div>
+          </div>
+        </div>
+
+        <!-- API DOCS -->
+        <div class="panel" id="panel-apidocs">
+          <div class="panel-header">
+            <div class="panel-eyebrow">📖 Reference</div>
+            <div class="panel-title">API Reference</div>
+            <div class="panel-desc">
+              All endpoints at a glance. For full documentation see
+              <a href="docs/api.html" style="color: var(--brand)"
+                >the API Guide →</a
+              >
+            </div>
+          </div>
+
+          <div class="docs-group">
+            <div class="docs-group-header">
+              <span class="docs-group-title">Admin Endpoints</span>
+              <span class="docs-auth-tag">x-admin-secret</span>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-get">GET</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/admin/tenants</div>
+                <div class="docs-desc">
+                  List all tenants with contact and campaign counts
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/admin/tenants</div>
+                <div class="docs-desc">
+                  Create tenant — body: { name, email, initialCredits }
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/admin/tenants/:id/credits</div>
+                <div class="docs-desc">
+                  Top up credits — body: { amount, reason }
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">
+                  /api/v1/admin/tenants/:id/rotate-key
+                </div>
+                <div class="docs-desc">
+                  Rotate API key — returns new key once
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-patch">PATCH</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/admin/tenants/:id/status</div>
+                <div class="docs-desc">Toggle tenant active/inactive</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="docs-group">
+            <div class="docs-group-header">
+              <span class="docs-group-title">Contacts</span>
+              <span class="docs-auth-tag tenant">Bearer API Key</span>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-get">GET</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/contacts</div>
+                <div class="docs-desc">
+                  List contacts — query: ?search=&page=&limit=
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/contacts</div>
+                <div class="docs-desc">
+                  Create or upsert contact — body: { phone, name?, notes? }
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/contacts/import</div>
+                <div class="docs-desc">
+                  Bulk CSV import — multipart/form-data, field: file
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-patch">PUT</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/contacts/:id</div>
+                <div class="docs-desc">Update contact — partial fields</div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-delete">DEL</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/contacts/:id</div>
+                <div class="docs-desc">
+                  Delete contact and remove from all groups
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="docs-group">
+            <div class="docs-group-header">
+              <span class="docs-group-title">Groups</span>
+              <span class="docs-auth-tag tenant">Bearer API Key</span>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-get">GET</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/groups</div>
+                <div class="docs-desc">List all groups with contact counts</div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/groups</div>
+                <div class="docs-desc">Create group — body: { name }</div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-get">GET</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/groups/:id/contacts</div>
+                <div class="docs-desc">List contacts in group — paginated</div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/groups/:id/contacts</div>
+                <div class="docs-desc">
+                  Add contacts — body: { contactIds: [] }
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-delete">DEL</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/groups/:id/contacts</div>
+                <div class="docs-desc">
+                  Remove contacts — body: { contactIds: [] }
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-delete">DEL</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/groups/:id</div>
+                <div class="docs-desc">
+                  Delete group — contacts not affected
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="docs-group">
+            <div class="docs-group-header">
+              <span class="docs-group-title">Campaigns</span>
+              <span class="docs-auth-tag tenant">Bearer API Key</span>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-get">GET</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/campaigns</div>
+                <div class="docs-desc">
+                  List all campaigns with delivery stats
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/campaigns</div>
+                <div class="docs-desc">
+                  Launch campaign — body: { name, groupId, message } — deducts
+                  credits immediately
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-get">GET</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/campaigns/:id/progress</div>
+                <div class="docs-desc">Live progress — poll every 2–3s</div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/campaigns/:id/cancel</div>
+                <div class="docs-desc">
+                  Cancel running campaign — refunds unprocessed credits
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="docs-group">
+            <div class="docs-group-header">
+              <span class="docs-group-title">Credits & Webhooks</span>
+              <span class="docs-auth-tag tenant">Bearer API Key</span>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-get">GET</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/credits</div>
+                <div class="docs-desc">
+                  Get current balance — returns { balance, currency }
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-get">GET</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/credits/ledger</div>
+                <div class="docs-desc">
+                  Full transaction history — paginated
+                </div>
+              </div>
+            </div>
+            <div class="docs-endpoint">
+              <span class="method-tag tag-post">POST</span>
+              <div class="docs-info">
+                <div class="docs-path">/api/v1/webhooks/twilio</div>
+                <div class="docs-desc">
+                  Twilio status callback — internal, called automatically by
+                  Twilio
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+      <span class="toast-icon" id="toastIcon">✓</span>
+      <span id="toastMsg"></span>
+    </div>
+
+    <script>
+      const BASE = () =>
+        document.getElementById("baseUrl").value.replace(/\/$/, "");
+
+      // ── NAV ────────────────────────────────────────────────────────────────
+      function show(id) {
+        document
+          .querySelectorAll(".panel")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        const panel = document.getElementById("panel-" + id);
+        if (panel) panel.classList.add("active");
+        document.querySelectorAll(".nav-item").forEach((n) => {
+          if (n.getAttribute("onclick")?.includes(`'${id}'`))
+            n.classList.add("active");
+        });
+      }
+
+      function toggleBlock(id) {
+        document.getElementById(id).classList.toggle("open");
+      }
+
+      // ── HTTP ───────────────────────────────────────────────────────────────
+      async function api(method, path, body, headers = {}) {
+        const t0 = Date.now();
+        try {
+          const opts = {
+            method,
+            headers: { "Content-Type": "application/json", ...headers },
+          };
+          if (body) opts.body = JSON.stringify(body);
+          const res = await fetch(BASE() + path, opts);
+          const data = await res.json().catch(() => ({}));
+          return { status: res.status, data, ms: Date.now() - t0 };
+        } catch (e) {
+          return { status: 0, data: { error: e.message }, ms: Date.now() - t0 };
+        }
+      }
+
+      function renderResponse(prefix, { status, data, ms }) {
+        const box = document.getElementById(prefix + "Response");
+        const chip = document.getElementById(prefix + "Status");
+        const time = document.getElementById(prefix + "Time");
+        const body = document.getElementById(prefix + "Body");
+        const init = document.getElementById(prefix + "InitMsg");
+
+        box.classList.add("show");
+        if (init) init.style.display = "none";
+        chip.style.display = "";
+
+        chip.textContent = status || "ERR";
+        chip.className =
+          "status-chip " +
+          (status >= 200 && status < 300
+            ? "chip-2xx"
+            : status >= 400
+              ? "chip-4xx"
+              : "chip-5xx");
+        time.textContent = ms + "ms";
+        body.innerHTML = highlight(JSON.stringify(data, null, 2));
+      }
+
+      function highlight(json) {
+        return json
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(
+            /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+            (m) => {
+              if (/^"/.test(m))
+                return /:$/.test(m)
+                  ? `<span class="jk">${m}</span>`
+                  : `<span class="js">${m}</span>`;
+              if (/true|false/.test(m)) return `<span class="jb">${m}</span>`;
+              if (/null/.test(m)) return `<span class="jnull">${m}</span>`;
+              return `<span class="jn">${m}</span>`;
+            },
+          );
+      }
+
+      function toast(msg, type = "success") {
+        const el = document.getElementById("toast");
+        document.getElementById("toastMsg").textContent = msg;
+        document.getElementById("toastIcon").textContent =
+          type === "success" ? "✓" : "✗";
+        el.className = `toast show ${type}`;
+        setTimeout(() => el.classList.remove("show"), 3000);
+      }
+
+      function copyPre(id) {
+        navigator.clipboard
+          .writeText(document.getElementById(id).textContent)
+          .then(() => toast("Copied to clipboard"));
+      }
+
+      // ── HEALTH ─────────────────────────────────────────────────────────────
+      async function checkHealth() {
+        const btn = document.getElementById("healthBtnText");
+        btn.innerHTML = '<span class="spinner"></span>';
+        const t0 = Date.now();
+        try {
+          const res = await fetch(BASE() + "/health");
+          const data = await res.json();
+          const ms = Date.now() - t0;
+
+          document.getElementById("h-status").textContent = data.status || "ok";
+          document.getElementById("h-status").className = "info-val ok";
+          document.getElementById("h-ts").textContent = new Date(
+            data.ts || Date.now(),
+          ).toLocaleTimeString();
+          document.getElementById("h-rt").textContent = ms + "ms";
+          document.getElementById("h-url").textContent = BASE();
+
+          document.getElementById("statusDot").className = "status-dot online";
+          document.getElementById("statusText").textContent = "Online";
+          document.getElementById("statusTs").textContent =
+            new Date().toLocaleTimeString();
+
+          const box = document.getElementById("healthResponse");
+          box.classList.add("show");
+          document.getElementById("healthInitMsg").style.display = "none";
+          document.getElementById("healthStatus").style.display = "";
+          document.getElementById("healthStatus").textContent = "200";
+          document.getElementById("healthStatus").className =
+            "status-chip chip-2xx";
+          document.getElementById("healthTime").textContent = ms + "ms";
+          document.getElementById("healthBody").innerHTML = highlight(
+            JSON.stringify(data, null, 2),
+          );
+
+          toast("Server is online");
+        } catch (e) {
+          document.getElementById("h-status").textContent = "Offline";
+          document.getElementById("h-status").className = "info-val err";
+          document.getElementById("statusDot").className = "status-dot offline";
+          document.getElementById("statusText").textContent = "Offline";
+          document.getElementById("healthBody").style.color = "#F97583";
+          document.getElementById("healthBody").textContent =
+            "Error: " +
+            e.message +
+            "\n\nMake sure your server is running:\nnpm run dev";
+          toast("Server unreachable", "error");
+        }
+        btn.textContent = "Check Health";
+      }
+
+      // ── STATS ──────────────────────────────────────────────────────────────
+      async function loadStats() {
+        const secret = document.getElementById("statsAdminSecret").value;
+        const r = await api("GET", "/api/v1/admin/tenants", null, {
+          "x-admin-secret": secret,
+        });
+        if (r.status === 200 && Array.isArray(r.data)) {
+          document.getElementById("stat-tenants").textContent = r.data.length;
+          document.getElementById("stat-active").textContent = r.data.filter(
+            (t) => t.isActive,
+          ).length;
+          document.getElementById("stat-contacts").textContent = r.data.reduce(
+            (s, t) => s + (t._count?.contacts || 0),
+            0,
+          );
+          document.getElementById("stat-campaigns").textContent = r.data.reduce(
+            (s, t) => s + (t._count?.campaigns || 0),
+            0,
+          );
+          toast("Stats loaded");
+        } else toast("Failed — check admin secret", "error");
+      }
+
+      // ── TENANTS ────────────────────────────────────────────────────────────
+      async function createTenant() {
+        const r = await api(
+          "POST",
+          "/api/v1/admin/tenants",
+          {
+            name: document.getElementById("tenantName").value,
+            email: document.getElementById("tenantEmail").value,
+            initialCredits:
+              parseInt(document.getElementById("tenantCredits").value) || 0,
+          },
+          { "x-admin-secret": document.getElementById("adminSecret").value },
+        );
+        renderResponse("createTenant", r);
+        r.status === 201
+          ? toast("Tenant created — save the API key!")
+          : toast("Error: " + r.data?.error, "error");
+      }
+
+      async function listTenants() {
+        const r = await api("GET", "/api/v1/admin/tenants", null, {
+          "x-admin-secret": document.getElementById("listAdminSecret").value,
+        });
+        renderResponse("listTenants", r);
+      }
+
+      async function topUpCredits() {
+        const id = document.getElementById("topupTenantId").value;
+        const r = await api(
+          "POST",
+          `/api/v1/admin/tenants/${id}/credits`,
+          {
+            amount: parseInt(document.getElementById("topupAmount").value),
+            reason: document.getElementById("topupReason").value,
+          },
+          { "x-admin-secret": document.getElementById("topupSecret").value },
+        );
+        renderResponse("topup", r);
+        if (r.status === 200) toast("Credits topped up!");
+      }
+
+      // ── CONTACTS ───────────────────────────────────────────────────────────
+      const key = (id) => ({
+        Authorization: "Bearer " + document.getElementById(id).value,
+      });
+
+      async function listContacts() {
+        const params = new URLSearchParams({
+          page: document.getElementById("contactPage").value,
+        });
+        const s = document.getElementById("contactSearch").value;
+        if (s) params.append("search", s);
+        const r = await api(
+          "GET",
+          `/api/v1/contacts?${params}`,
+          null,
+          key("tenantApiKey"),
+        );
+        renderResponse("listContacts", r);
+      }
+
+      async function createContact() {
+        const r = await api(
+          "POST",
+          "/api/v1/contacts",
+          {
+            name: document.getElementById("newContactName").value,
+            phone: document.getElementById("newContactPhone").value,
+            notes:
+              document.getElementById("newContactNotes").value || undefined,
+          },
+          key("tenantApiKey"),
+        );
+        renderResponse("createContact", r);
+        r.status === 201
+          ? toast("Contact created!")
+          : toast(
+              "Error: " +
+                (r.data?.error?.fieldErrors?.phone?.[0] || r.data?.error),
+              "error",
+            );
+      }
+
+      // ── GROUPS ─────────────────────────────────────────────────────────────
+      async function listGroups() {
+        renderResponse(
+          "listGroups",
+          await api("GET", "/api/v1/groups", null, key("groupsApiKey")),
+        );
+      }
+
+      async function createGroup() {
+        const r = await api(
+          "POST",
+          "/api/v1/groups",
+          {
+            name: document.getElementById("newGroupName").value,
+          },
+          key("groupsApiKey"),
+        );
+        renderResponse("createGroup", r);
+        if (r.status === 201) toast("Group created!");
+      }
+
+      // ── CAMPAIGNS ──────────────────────────────────────────────────────────
+      document.addEventListener("DOMContentLoaded", () => {
+        document
+          .getElementById("campMessage")
+          ?.addEventListener("input", function () {
+            const len = this.value.length;
+            document.getElementById("charCount").textContent = len;
+            document.getElementById("creditEst").textContent =
+              Math.ceil(len / 160) || 1;
+          });
+        checkHealth();
+      });
+
+      async function launchCampaign() {
+        const r = await api(
+          "POST",
+          "/api/v1/campaigns",
+          {
+            name: document.getElementById("campName").value,
+            groupId: document.getElementById("campGroupId").value,
+            message: document.getElementById("campMessage").value,
+          },
+          key("campaignsApiKey"),
+        );
+        renderResponse("launchCamp", r);
+        if (r.status === 201) {
+          toast(
+            "Campaign launched — " + r.data.totalMessages + " messages queued",
+          );
+          document.getElementById("progressCampId").value = r.data.id;
+          document.getElementById("rb-campaign-progress").classList.add("open");
+        } else toast("Error: " + r.data?.error, "error");
+      }
+
+      let pollTimer = null;
+
+      function togglePoll() {
+        const btn = document.getElementById("pollBtn");
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+          btn.textContent = "Start Polling";
+          btn.className = "btn btn-secondary";
+        } else {
+          getCampaignProgress();
+          pollTimer = setInterval(getCampaignProgress, 2500);
+          btn.textContent = "Stop Polling";
+          btn.className = "btn btn-danger";
+        }
+      }
+
+      async function getCampaignProgress() {
+        const id = document.getElementById("progressCampId").value;
+        if (!id) return;
+        const r = await api(
+          "GET",
+          `/api/v1/campaigns/${id}/progress`,
+          null,
+          key("campaignsApiKey"),
+        );
+        renderResponse("progress", r);
+
+        if (r.status === 200) {
+          const d = r.data;
+          document.getElementById("progressContainer").style.display = "block";
+          document.getElementById("progressBar").style.width =
+            d.progressPercent + "%";
+          document.getElementById("progressPct").textContent =
+            d.progressPercent + "%";
+          document.getElementById("progressLabel").textContent = d.status;
+          document.getElementById("sentCount").textContent = d.sentCount;
+          document.getElementById("failedCount").textContent = d.failedCount;
+          document.getElementById("pendingCount").textContent = d.pending;
+          document.getElementById("totalCount").textContent = d.totalMessages;
+
+          if (d.status === "COMPLETED" || d.status === "CANCELLED") {
+            if (pollTimer) {
+              clearInterval(pollTimer);
+              pollTimer = null;
+            }
+            document.getElementById("pollBtn").textContent = "Start Polling";
+            document.getElementById("pollBtn").className = "btn btn-secondary";
+            toast("Campaign " + d.status.toLowerCase());
+          }
+        }
+      }
+
+      // ── CREDITS ────────────────────────────────────────────────────────────
+      async function getCredits() {
+        const r = await api(
+          "GET",
+          "/api/v1/credits",
+          null,
+          key("creditsApiKey"),
+        );
+        document.getElementById("creditsInitMsg").style.display = "none";
+        document.getElementById("creditsStatus").style.display = "";
+        renderResponse("credits", r);
+      }
+
+      async function getLedger() {
+        renderResponse(
+          "ledger",
+          await api(
+            "GET",
+            "/api/v1/credits/ledger",
+            null,
+            key("creditsApiKey"),
+          ),
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMSaaS — Documentation</title>
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">
+    <div class="topbar-icon">💬</div>
+    <span class="topbar-name">SMSaaS</span>
+  </a>
+  <span class="topbar-product">Documentation</span>
+  <nav class="topbar-nav">
+    <a href="index.html" class="topbar-link active">Overview</a>
+    <a href="brd.html" class="topbar-link">BRD</a>
+    <a href="frd.html" class="topbar-link">FRD</a>
+    <a href="api.html" class="topbar-link">API Guide</a>
+    <a href="../index.html" class="topbar-link">← API Console</a>
+  </nav>
+</header>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Product Overview</div>
+      <a href="#what" class="sidebar-link active"><span class="dot"></span>What is SMSaaS?</a>
+      <a href="#concepts" class="sidebar-link"><span class="dot"></span>Key Concepts</a>
+      <a href="#howworks" class="sidebar-link"><span class="dot"></span>How It Works</a>
+      <a href="#console" class="sidebar-link"><span class="dot"></span>The Client Console</a>
+      <a href="#credits" class="sidebar-link"><span class="dot"></span>Credits & Billing</a>
+      <a href="#clients" class="sidebar-link"><span class="dot"></span>For Business Clients</a>
+      <a href="#limits" class="sidebar-link"><span class="dot"></span>Capabilities & Limits</a>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Documents</div>
+      <a href="brd.html" class="sidebar-link"><span class="dot"></span>Business Requirements</a>
+      <a href="frd.html" class="sidebar-link"><span class="dot"></span>Functional Requirements</a>
+      <a href="api.html" class="sidebar-link"><span class="dot"></span>API Guide</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="content">
+
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Product Overview</span>
+      </div>
+
+      <!-- PAGE HEADER -->
+      <div class="page-header">
+        <div class="page-eyebrow">📋 Product Overview</div>
+        <h1 class="page-title">SMSaaS Platform</h1>
+        <p class="page-subtitle">Bulk SMS platform for Maldivian businesses. Send thousands of messages in minutes with zero technical setup for clients.</p>
+        <div class="page-meta">
+          <span class="meta-item"><strong>Version</strong> 1.0</span>
+          <span class="meta-item"><strong>Status</strong> <span class="badge badge-version">In Development</span></span>
+          <span class="meta-item"><strong>Last Updated</strong> February 2026</span>
+        </div>
+      </div>
+
+      <!-- STAT STRIP -->
+      <div class="stat-strip">
+        <div class="stat-item">
+          <div class="stat-value">20k+</div>
+          <div class="stat-label">Messages per campaign</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">&lt;2min</div>
+          <div class="stat-label">To reach 10,000 people</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">Zero</div>
+          <div class="stat-label">Technical setup for clients</div>
+        </div>
+      </div>
+
+      <!-- WHAT IS IT -->
+      <h1 class="section-title section-anchor" id="what">What is SMSaaS?</h1>
+      <p>SMSaaS is a multi-tenant bulk SMS platform built specifically for Maldivian businesses. The platform operator owns a single Twilio account, purchases SMS at wholesale rates, and resells to business clients through a clean web interface.</p>
+      <p>Each client gets their own branded console — a web application they can log into, upload their customer contacts, organise them into groups, and send bulk SMS campaigns. They never interact with Twilio or any technical infrastructure. From their perspective, it just works.</p>
+
+      <div class="callout callout-info">
+        <span class="callout-icon">💡</span>
+        <div class="callout-body">
+          <p class="callout-title">The core value proposition</p>
+          <p class="callout-text">No Twilio account, no business verification, no technical knowledge needed. A Maldivian business logs in, uploads a list, writes a message, clicks send. The platform handles everything else.</p>
+        </div>
+      </div>
+
+      <h2 class="subsection">Who is it for?</h2>
+      <table class="doc-table">
+        <thead><tr><th>Business Type</th><th>Example Uses</th></tr></thead>
+        <tbody>
+          <tr><td>Cafes & Restaurants</td><td>Daily specials, Ramadan offers, event invitations, loyalty rewards</td></tr>
+          <tr><td>Retail Shops</td><td>Sales promotions, new arrivals, end-of-season clearance</td></tr>
+          <tr><td>Resorts & Guesthouses</td><td>Booking confirmations, activity reminders, guest welcome messages</td></tr>
+          <tr><td>Clinics & Pharmacies</td><td>Appointment reminders, prescription ready notifications</td></tr>
+          <tr><td>Schools & Universities</td><td>Fee reminders, exam schedules, event notices</td></tr>
+          <tr><td>Banks & Finance</td><td>Transaction alerts, loan reminders, promotional offers</td></tr>
+          <tr><td>Government & NGOs</td><td>Public announcements, awareness campaigns</td></tr>
+        </tbody>
+      </table>
+
+      <!-- KEY CONCEPTS -->
+      <h1 class="section-title section-anchor" id="concepts">Key Concepts</h1>
+      <p>Understanding these six terms is all you need to understand the entire platform.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-icon">🏢</div>
+          <div class="concept-title">Tenant</div>
+          <div class="concept-subtitle">A business account</div>
+          <p class="concept-text">Any business or organisation with an account on the platform. Each Tenant has completely isolated data — contacts, groups, campaigns, and credits. Example: <em>Reethi Cafe</em> is one Tenant.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-icon">👤</div>
+          <div class="concept-title">Contact</div>
+          <div class="concept-subtitle">A customer phone number</div>
+          <p class="concept-text">A single customer — their name and Maldivian mobile number. Contacts belong to one Tenant and can be added manually or imported from a CSV spreadsheet.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-icon">👥</div>
+          <div class="concept-title">Group</div>
+          <div class="concept-subtitle">A named list of contacts</div>
+          <p class="concept-text">A collection of Contacts — like a mailing list but for SMS. One Contact can be in multiple Groups. Example: <em>VIP Customers</em>, <em>Staff</em>, <em>Dhiraagu Users</em>.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-icon">📣</div>
+          <div class="concept-title">Campaign</div>
+          <div class="concept-subtitle">One bulk SMS send</div>
+          <p class="concept-text">The act of sending one message to every Contact in a Group. After launching, the platform handles all sending and provides a live progress report.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-icon">💳</div>
+          <div class="concept-title">Credits</div>
+          <div class="concept-subtitle">Pre-paid SMS currency</div>
+          <p class="concept-text">1 credit = 1 SMS to 1 person. Credits are purchased in advance. A Tenant must have enough credits before a campaign can launch. Failed messages are refunded.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-icon">🖥️</div>
+          <div class="concept-title">Console</div>
+          <div class="concept-subtitle">A tenant's web interface</div>
+          <p class="concept-text">The website a Tenant logs into to use the platform. Each Tenant gets their own Console, which can be branded with their business name and hosted on a custom URL.</p>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <h1 class="section-title section-anchor" id="howworks">How It Works</h1>
+      <p>From a business clicking Send to a customer receiving an SMS — here is the complete flow.</p>
+
+      <h2 class="subsection">Architecture overview</h2>
+      <pre><span class="comment">┌─────────────────────────────────────────────────────┐
+│              SMS API SERVER (Railway)               │
+│                                                     │
+│  REST API  ·  BullMQ Queue  ·  SMS Worker           │
+│  PostgreSQL (data)  ·  Redis (queue)                │
+└──────────────┬──────────────────────────────────────┘
+               │  API Key auth (per tenant)
+      ┌────────┴────────┐
+      │                 │
+┌─────▼──────┐    ┌─────▼──────┐
+│  Client A  │    │  Client B  │    ...more clients
+│  Console   │    │  Console   │
+│  (Vercel)  │    │  (Vercel)  │
+└────────────┘    └────────────┘</span></pre>
+
+      <h2 class="subsection">Campaign send flow</h2>
+      <div class="step-flow">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Business clicks Send in their Console</div>
+            <div class="step-desc">The Console sends the campaign details to the SMS API Server — group ID, message body, and the tenant's API key for authentication.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Server validates and deducts credits</div>
+            <div class="step-desc">The server checks the Tenant has enough credits. If yes, credits are deducted immediately before any messages are sent — preventing overspend.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Campaign and messages created in database</div>
+            <div class="step-desc">A Campaign record is created with status RUNNING. One Message record is created per Contact in the Group, all starting as QUEUED.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Jobs pushed to BullMQ queue</div>
+            <div class="step-desc">Every message is added to a Redis-backed job queue. The server immediately responds to the Console: "Campaign launched, X messages queued."</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">Worker sends via Twilio</div>
+            <div class="step-desc">A background worker processes jobs from the queue — 10 concurrently, up to 100/second. Each message is sent through the Twilio Messaging Service.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <div class="step-title">Twilio routes to Dhiraagu or Ooredoo</div>
+            <div class="step-desc">Twilio determines the carrier for each number and routes accordingly. The message arrives on the customer's handset.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">7</div>
+          <div class="step-content">
+            <div class="step-title">Delivery status webhook</div>
+            <div class="step-desc">Twilio POSTs a status callback to the server when each message is delivered or fails. The server updates the Message record in the database.</div>
+          </div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">8</div>
+          <div class="step-content">
+            <div class="step-title">Console shows live results</div>
+            <div class="step-desc">The Console polls the progress endpoint every 2–3 seconds and displays a live progress bar with sent, delivered, failed, and pending counts.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONSOLE -->
+      <h1 class="section-title section-anchor" id="console">The Client Console</h1>
+      <p>The Console is the only thing a Tenant ever sees. All technical infrastructure — the server, Redis, Twilio — is completely invisible to them.</p>
+
+      <h2 class="subsection">What a tenant can do</h2>
+      <table class="doc-table">
+        <thead><tr><th>Feature</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Manage Contacts</td><td>Add manually or import CSV. Search, edit, delete. See which groups a contact belongs to.</td></tr>
+          <tr><td>Manage Groups</td><td>Create named groups. Add/remove contacts. One contact can be in multiple groups.</td></tr>
+          <tr><td>Send Campaigns</td><td>Choose a group, write a message, name the campaign, click send. Platform handles everything.</td></tr>
+          <tr><td>Track Progress</td><td>Live progress bar during sending. Campaign history with full delivery statistics.</td></tr>
+          <tr><td>Check Credits</td><td>Current balance visible at all times. Full transaction ledger — every credit purchased and spent.</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="subsection">Custom console per client</h2>
+      <p>Each Tenant gets their own Console — a separate Next.js application deployed independently to Vercel. One API key connects it to the central server. This means:</p>
+      <ul class="doc-list">
+        <li>Each console can be branded with the client's business name and logo</li>
+        <li>Client gets their own URL — e.g. <code>sms.reethicafe.mv</code></li>
+        <li>Adding a new client = deploy a new Vercel project + set one environment variable</li>
+        <li>All clients share the same backend server — infrastructure cost stays flat</li>
+      </ul>
+
+      <!-- CREDITS -->
+      <h1 class="section-title section-anchor" id="credits">Credits & Billing</h1>
+
+      <h2 class="subsection">How credits work</h2>
+      <ul class="doc-list">
+        <li><strong>1 credit = 1 SMS</strong> sent to 1 person (for messages up to 160 characters)</li>
+        <li>Credits are <strong>pre-purchased</strong> — deducted before the campaign sends</li>
+        <li>Failed messages (after 3 retries) are <strong>automatically refunded</strong></li>
+        <li>Cancelled campaigns refund all unprocessed credits immediately</li>
+        <li>Credits never expire</li>
+      </ul>
+
+      <h2 class="subsection">Credit cost by message length</h2>
+      <table class="doc-table">
+        <thead><tr><th>Message Length</th><th>Credits per Recipient</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>1–160 characters</td><td>1 credit</td><td>Standard single SMS</td></tr>
+          <tr><td>161–306 characters</td><td>2 credits</td><td>Splits into 2 SMS parts</td></tr>
+          <tr><td>307–459 characters</td><td>3 credits</td><td>Splits into 3 SMS parts</td></tr>
+          <tr><td>Contains emoji</td><td>More credits</td><td>Reduces limit to 70 chars/segment</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="subsection">Example pricing model</h2>
+      <table class="doc-table">
+        <thead><tr><th>Item</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>Buy from Twilio</td><td>~0.50 laari per SMS (verify at twilio.com/sms/pricing)</td></tr>
+          <tr><td>Sell to clients</td><td>0.90 laari per credit</td></tr>
+          <tr><td>Margin</td><td>0.40 laari per message</td></tr>
+          <tr><td>10,000 msg campaign</td><td>Client pays 9,000 MVR · Your cost ~5,000 MVR · Profit ~4,000 MVR</td></tr>
+          <tr><td>3 clients × 10k/month</td><td>~12,000 MVR monthly recurring, passive after setup</td></tr>
+        </tbody>
+      </table>
+
+      <!-- FOR CLIENTS -->
+      <h1 class="section-title section-anchor" id="clients">For Business Clients</h1>
+      <p>This section is written for the business client — the Tenant using the platform. Share this with clients during onboarding.</p>
+
+      <h2 class="subsection">Getting started in 6 steps</h2>
+      <div class="step-flow">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-content"><div class="step-title">Receive your Console link</div><div class="step-desc">The platform operator creates your account and gives you a link to your Console and login credentials.</div></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-content"><div class="step-title">Import your contacts</div><div class="step-desc">Prepare a spreadsheet (CSV) with columns: name, phone. Upload it in the Contacts section. The platform validates and imports your list automatically.</div></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-content"><div class="step-title">Create groups</div><div class="step-desc">Organise contacts into named lists — e.g. All Customers, VIP Members, Guests. One contact can be in multiple groups.</div></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-content"><div class="step-title">Purchase credits</div><div class="step-desc">Contact your platform provider to buy SMS credits. Credits are added to your account and visible in the Console.</div></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="step-content"><div class="step-title">Launch a campaign</div><div class="step-desc">Go to Campaigns → choose a group → write your message (keep it under 160 characters) → click Send.</div></div>
+        </div>
+        <div class="step-item">
+          <div class="step-num">6</div>
+          <div class="step-content"><div class="step-title">Watch live results</div><div class="step-desc">A progress bar shows delivered, failed, and pending in real time. Most campaigns complete within a few minutes.</div></div>
+        </div>
+      </div>
+
+      <h2 class="subsection">CSV format for contact import</h2>
+      <pre>name,phone,notes
+Ahmed Ali,+9607123456,VIP
+Fathimath,7654321,Regular customer
+Ibrahim,00960 7 111 222,New signup
+
+<span class="comment"># All three phone formats above are accepted and normalised automatically</span></pre>
+
+      <h2 class="subsection">Campaign delivery statuses</h2>
+      <table class="doc-table">
+        <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>Queued</td><td>Message is waiting to be sent</td></tr>
+          <tr><td>Sent</td><td>Message dispatched to Twilio and on its way</td></tr>
+          <tr><td>Delivered</td><td>Carrier confirmed the message arrived on the handset</td></tr>
+          <tr><td>Failed</td><td>Could not send — usually invalid or inactive number (credit refunded)</td></tr>
+          <tr><td>Undelivered</td><td>Sent but carrier reported non-delivery — may indicate opted-out number</td></tr>
+        </tbody>
+      </table>
+
+      <!-- LIMITS -->
+      <h1 class="section-title section-anchor" id="limits">Capabilities & Limits</h1>
+      <table class="doc-table">
+        <thead><tr><th>Capability</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>Campaign size</td><td>Up to 20,000+ messages per campaign</td></tr>
+          <tr><td>Send speed</td><td>~10,000 messages per minute</td></tr>
+          <tr><td>Contacts per tenant</td><td>Unlimited</td></tr>
+          <tr><td>Groups per tenant</td><td>Unlimited</td></tr>
+          <tr><td>Concurrent campaigns</td><td>One per tenant at a time</td></tr>
+          <tr><td>Message length</td><td>Up to 918 characters (6 SMS segments)</td></tr>
+          <tr><td>Phone numbers</td><td>Maldivian mobile numbers only (+960 7xxxxxxx)</td></tr>
+          <tr><td>Retry on failure</td><td>3 automatic retries with exponential backoff</td></tr>
+          <tr><td>Tenants on one server</td><td>Multiple — data fully isolated per tenant</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p class="callout-title">Not in v1.0</p>
+          <p class="callout-text">Scheduled sending, two-way SMS, message personalisation (merge tags), international numbers, and self-serve credit top-up are planned for future versions.</p>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<script>
+  // Highlight active sidebar link on scroll
+  const links = document.querySelectorAll('.sidebar-link[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.sidebar-link[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('.section-anchor').forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

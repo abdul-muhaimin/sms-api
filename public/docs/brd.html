@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRD — SMSaaS Documentation</title>
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">
+    <div class="topbar-icon">💬</div>
+    <span class="topbar-name">SMSaaS</span>
+  </a>
+  <span class="topbar-product">Documentation</span>
+  <nav class="topbar-nav">
+    <a href="index.html" class="topbar-link">Overview</a>
+    <a href="brd.html" class="topbar-link active">BRD</a>
+    <a href="frd.html" class="topbar-link">FRD</a>
+    <a href="api.html" class="topbar-link">API Guide</a>
+    <a href="../index.html" class="topbar-link">← API Console</a>
+  </nav>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">BRD Contents</div>
+      <a href="#overview" class="sidebar-link active"><span class="dot"></span>1. Executive Summary</a>
+      <a href="#problem" class="sidebar-link"><span class="dot"></span>2. Problem Statement</a>
+      <a href="#objectives" class="sidebar-link"><span class="dot"></span>3. Business Objectives</a>
+      <a href="#stakeholders" class="sidebar-link"><span class="dot"></span>4. Stakeholders</a>
+      <a href="#scope" class="sidebar-link"><span class="dot"></span>5. Scope</a>
+      <a href="#model" class="sidebar-link"><span class="dot"></span>6. Business Model</a>
+      <a href="#success" class="sidebar-link"><span class="dot"></span>7. Success Metrics</a>
+      <a href="#risks" class="sidebar-link"><span class="dot"></span>8. Risks & Assumptions</a>
+      <a href="#constraints" class="sidebar-link"><span class="dot"></span>9. Constraints</a>
+      <a href="#timeline" class="sidebar-link"><span class="dot"></span>10. Timeline</a>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Other Documents</div>
+      <a href="index.html" class="sidebar-link"><span class="dot"></span>Product Overview</a>
+      <a href="frd.html" class="sidebar-link"><span class="dot"></span>Functional Requirements</a>
+      <a href="api.html" class="sidebar-link"><span class="dot"></span>API Guide</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="content">
+
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Business Requirements Document</span>
+      </div>
+
+      <div class="page-header">
+        <div class="page-eyebrow">📄 BRD</div>
+        <h1 class="page-title">Business Requirements Document</h1>
+        <p class="page-subtitle">Defines the business goals, stakeholders, scope, revenue model, and success criteria for the SMSaaS platform.</p>
+        <div class="page-meta">
+          <span class="meta-item"><strong>Version</strong> 1.0</span>
+          <span class="meta-item"><strong>Status</strong> <span class="badge badge-version">Draft</span></span>
+          <span class="meta-item"><strong>Owner</strong> Platform Operator</span>
+          <span class="meta-item"><strong>Date</strong> February 2026</span>
+        </div>
+      </div>
+
+      <!-- TOC -->
+      <div class="toc">
+        <div class="toc-title">Contents</div>
+        <ul class="toc-list">
+          <li><a href="#overview"><span class="toc-num">1</span>Executive Summary</a></li>
+          <li><a href="#problem"><span class="toc-num">2</span>Problem Statement</a></li>
+          <li><a href="#objectives"><span class="toc-num">3</span>Business Objectives</a></li>
+          <li><a href="#stakeholders"><span class="toc-num">4</span>Stakeholders</a></li>
+          <li><a href="#scope"><span class="toc-num">5</span>Scope</a></li>
+          <li><a href="#model"><span class="toc-num">6</span>Business Model</a></li>
+          <li><a href="#success"><span class="toc-num">7</span>Success Metrics</a></li>
+          <li><a href="#risks"><span class="toc-num">8</span>Risks & Assumptions</a></li>
+          <li><a href="#constraints"><span class="toc-num">9</span>Constraints</a></li>
+          <li><a href="#timeline"><span class="toc-num">10</span>Timeline</a></li>
+        </ul>
+      </div>
+
+      <!-- 1. EXECUTIVE SUMMARY -->
+      <h1 class="section-title section-anchor" id="overview">1. Executive Summary</h1>
+      <p>SMSaaS is a Software-as-a-Service bulk SMS platform designed for the Maldivian market. The platform enables local businesses to send mass SMS messages to their customers without requiring any technical knowledge, Twilio account, or third-party setup.</p>
+      <p>The platform operator builds and maintains a single centralised SMS API server. Business clients are onboarded as Tenants with isolated accounts and dedicated console interfaces. Revenue is generated through a credit-based SMS resale model — buying wholesale from Twilio and selling at a markup to clients.</p>
+
+      <div class="callout callout-info">
+        <span class="callout-icon">📌</span>
+        <div class="callout-body">
+          <p class="callout-title">Scope of this document</p>
+          <p class="callout-text">This BRD defines what the business needs the system to accomplish and why. It does not define how features are implemented — that is covered in the Functional Requirements Document (FRD).</p>
+        </div>
+      </div>
+
+      <!-- 2. PROBLEM STATEMENT -->
+      <h1 class="section-title section-anchor" id="problem">2. Problem Statement</h1>
+      <p>Maldivian businesses that want to send bulk SMS to their customers currently face significant barriers:</p>
+
+      <h2 class="subsection">Current pain points</h2>
+      <table class="doc-table">
+        <thead><tr><th>Pain Point</th><th>Impact on Business</th></tr></thead>
+        <tbody>
+          <tr><td>Foreign SMS providers require business verification</td><td>Complex, time-consuming registration process — often abandoned</td></tr>
+          <tr><td>Technical integration required</td><td>Most local businesses have no technical staff — APIs are inaccessible</td></tr>
+          <tr><td>Manual SMS sending</td><td>Impossible at scale — sending 1,000 messages manually is not viable</td></tr>
+          <tr><td>No local dedicated SMS platform</td><td>Businesses resort to WhatsApp broadcasts or social media — inferior reach and professionalism</td></tr>
+          <tr><td>Lack of delivery tracking</td><td>No way to know if messages arrived — no campaign intelligence</td></tr>
+          <tr><td>High per-message cost from resellers</td><td>Informal SMS services are expensive and unreliable</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="subsection">Opportunity</h2>
+      <p>There is no dedicated, simple, self-service bulk SMS platform built for Maldivian businesses. The market is underserved. A platform that removes all friction — no registration with Twilio, no technical knowledge, no manual process — addresses a real and immediate need.</p>
+
+      <!-- 3. OBJECTIVES -->
+      <h1 class="section-title section-anchor" id="objectives">3. Business Objectives</h1>
+
+      <h3 class="sub-subsection">Primary objectives</h3>
+      <div class="req-item">
+        <span class="req-id">BO-01</span>
+        <div class="req-content">
+          <div class="req-title">Generate recurring passive revenue</div>
+          <p class="req-desc">Build a platform that generates ongoing income through SMS credit markup, with minimal operator involvement after initial client setup.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">BO-02</span>
+        <div class="req-content">
+          <div class="req-title">Provide a genuinely useful service to Maldivian businesses</div>
+          <p class="req-desc">Solve the real problem of bulk SMS accessibility in the Maldives. The product must work reliably and be simple enough for non-technical staff to operate.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">BO-03</span>
+        <div class="req-content">
+          <div class="req-title">Build a scalable multi-tenant architecture</div>
+          <p class="req-desc">The platform must support multiple business clients from a single server instance. Adding a new client must not require significant additional infrastructure.</p>
+        </div>
+      </div>
+
+      <h3 class="sub-subsection">Secondary objectives</h3>
+      <div class="req-item">
+        <span class="req-id">BO-04</span>
+        <div class="req-content">
+          <div class="req-title">Establish the operator as a trusted SMS infrastructure provider</div>
+          <p class="req-desc">Position the platform as the go-to SMS solution for Maldivian businesses, building a defensible client base over time.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">BO-05</span>
+        <div class="req-content">
+          <div class="req-title">Maintain positive cash flow from day one</div>
+          <p class="req-desc">The credit pre-purchase model means clients pay before they send. The platform should never be in a position where it has delivered SMS without payment.</p>
+        </div>
+      </div>
+
+      <!-- 4. STAKEHOLDERS -->
+      <h1 class="section-title section-anchor" id="stakeholders">4. Stakeholders</h1>
+      <table class="doc-table">
+        <thead><tr><th>Stakeholder</th><th>Role</th><th>Interest</th></tr></thead>
+        <tbody>
+          <tr><td>Platform Operator</td><td>Owner and developer</td><td>Build the platform, onboard clients, manage server, earn revenue from SMS markup</td></tr>
+          <tr><td>Business Clients (Tenants)</td><td>Primary users</td><td>Send bulk SMS to customers reliably, cheaply, and without technical complexity</td></tr>
+          <tr><td>End Customers</td><td>SMS recipients</td><td>Receive relevant, non-spam messages from businesses they have a relationship with</td></tr>
+          <tr><td>Twilio</td><td>SMS gateway provider</td><td>Commercial relationship — provides wholesale SMS routing to Maldivian carriers</td></tr>
+          <tr><td>Dhiraagu / Ooredoo MV</td><td>Maldivian carriers</td><td>Final delivery of messages to handsets — no direct relationship with platform</td></tr>
+        </tbody>
+      </table>
+
+      <!-- 5. SCOPE -->
+      <h1 class="section-title section-anchor" id="scope">5. Scope</h1>
+
+      <h2 class="subsection">In scope — Version 1.0</h2>
+      <ul class="doc-list">
+        <li>Multi-tenant SMS API server with full tenant isolation</li>
+        <li>Contact management — create, import (CSV), update, delete</li>
+        <li>Group management — create groups, add/remove contacts</li>
+        <li>Bulk SMS campaigns — send to a group, track progress in real time</li>
+        <li>Credit system — pre-purchase model, automatic deduction, refunds on failure</li>
+        <li>Admin panel — create tenants, top up credits, rotate API keys, disable accounts</li>
+        <li>Twilio webhook integration — real-time delivery status updates</li>
+        <li>Client console — Next.js frontend per client, connects via API key</li>
+        <li>Background worker — BullMQ + Redis, 3 retries, concurrency controls</li>
+        <li>API documentation — hosted at <code>/docs</code></li>
+      </ul>
+
+      <h2 class="subsection">Out of scope — Version 1.0</h2>
+      <ul class="doc-list">
+        <li>Scheduled / future-dated campaigns</li>
+        <li>Two-way SMS (inbound message handling)</li>
+        <li>Message personalisation / merge tags</li>
+        <li>Self-serve credit purchase (payment gateway integration)</li>
+        <li>International phone number support</li>
+        <li>Email or WhatsApp channels</li>
+        <li>Multi-user access per tenant with roles</li>
+        <li>Analytics dashboards beyond campaign progress</li>
+      </ul>
+
+      <!-- 6. BUSINESS MODEL -->
+      <h1 class="section-title section-anchor" id="model">6. Business Model</h1>
+
+      <h2 class="subsection">Revenue streams</h2>
+      <table class="doc-table">
+        <thead><tr><th>Stream</th><th>Description</th><th>Timing</th></tr></thead>
+        <tbody>
+          <tr><td>Development fee</td><td>One-time fee charged to each client for platform setup and console deployment</td><td>Upfront, per client</td></tr>
+          <tr><td>SMS credit markup</td><td>Buy from Twilio at wholesale rate, sell to clients at markup. 0.40 MVR margin per message at current rates.</td><td>Per send, recurring</td></tr>
+          <tr><td>Optional monthly fee</td><td>Small platform fee to cover hosting costs (optional — SMS markup alone may be sufficient)</td><td>Monthly recurring</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="subsection">Unit economics</h2>
+      <table class="doc-table">
+        <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>Cost per SMS (Twilio, to MV)</td><td>~0.50 laari (verify at twilio.com/sms/pricing)</td></tr>
+          <tr><td>Sell price per credit</td><td>0.90 laari</td></tr>
+          <tr><td>Gross margin per message</td><td>0.40 laari (44%)</td></tr>
+          <tr><td>Revenue per 10k message campaign</td><td>9,000 MVR</td></tr>
+          <tr><td>Cost per 10k message campaign</td><td>~5,000 MVR</td></tr>
+          <tr><td>Profit per 10k message campaign</td><td>~4,000 MVR</td></tr>
+          <tr><td>Monthly revenue — 3 clients × 10k msgs</td><td>~12,000 MVR recurring</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-warning">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <p class="callout-title">Verify Twilio pricing before going live</p>
+          <p class="callout-text">SMS rates to Maldivian numbers must be confirmed at twilio.com/sms/pricing before setting client sell prices. Rates vary by carrier and change over time. Build your pricing with enough margin to absorb rate changes.</p>
+        </div>
+      </div>
+
+      <!-- 7. SUCCESS METRICS -->
+      <h1 class="section-title section-anchor" id="success">7. Success Metrics</h1>
+      <table class="doc-table">
+        <thead><tr><th>Metric</th><th>Target — Month 3</th><th>Target — Month 12</th></tr></thead>
+        <tbody>
+          <tr><td>Active paying tenants</td><td>2–3</td><td>8–12</td></tr>
+          <tr><td>Monthly SMS sent</td><td>20,000+</td><td>100,000+</td></tr>
+          <tr><td>Monthly recurring revenue</td><td>8,000 MVR+</td><td>40,000 MVR+</td></tr>
+          <tr><td>Campaign delivery rate</td><td>&gt;95%</td><td>&gt;95%</td></tr>
+          <tr><td>Server uptime</td><td>&gt;99%</td><td>&gt;99.5%</td></tr>
+          <tr><td>Avg campaign completion time (10k msgs)</td><td>&lt;3 min</td><td>&lt;2 min</td></tr>
+          <tr><td>Client churn rate</td><td>&lt;10%</td><td>&lt;5%</td></tr>
+        </tbody>
+      </table>
+
+      <!-- 8. RISKS -->
+      <h1 class="section-title section-anchor" id="risks">8. Risks & Assumptions</h1>
+
+      <h2 class="subsection">Risks</h2>
+      <table class="doc-table">
+        <thead><tr><th>Risk</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td>Twilio rate increase to MV numbers</td><td>Medium</td><td>Medium</td><td>Build adequate margin buffer. Review rates quarterly. Pass increases to clients with notice.</td></tr>
+          <tr><td>Twilio account suspension</td><td>Low</td><td>High</td><td>Follow Twilio's usage policies strictly. Implement opt-out handling. Maintain account in good standing.</td></tr>
+          <tr><td>Maldivian carrier delivery issues</td><td>Medium</td><td>Medium</td><td>Test both Dhiraagu and Ooredoo before go-live. Monitor delivery rates per carrier.</td></tr>
+          <tr><td>Client uses platform for spam</td><td>Low</td><td>High</td><td>Require clients to confirm they have permission to contact their list. Enforce opt-out compliance.</td></tr>
+          <tr><td>Redis or Postgres outage on Railway</td><td>Low</td><td>High</td><td>Railway managed databases have built-in redundancy. Worker retries prevent message loss.</td></tr>
+          <tr><td>Slow client adoption</td><td>Medium</td><td>Medium</td><td>Development fee provides immediate revenue. Credit model means no ongoing cost if clients are inactive.</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="subsection">Assumptions</h2>
+      <ul class="doc-list">
+        <li>Twilio can deliver SMS to both Dhiraagu and Ooredoo MV numbers reliably</li>
+        <li>Target clients have a contact list ready to import (or can compile one)</li>
+        <li>Clients are comfortable with a web-based tool — no mobile app required for v1</li>
+        <li>The platform operator has or can obtain a Twilio account with MV routing enabled</li>
+        <li>Railway provides sufficient uptime and performance for the expected load</li>
+      </ul>
+
+      <!-- 9. CONSTRAINTS -->
+      <h1 class="section-title section-anchor" id="constraints">9. Constraints</h1>
+      <table class="doc-table">
+        <thead><tr><th>Constraint</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>Geography</td><td>v1.0 supports Maldivian phone numbers only (+960 7xxxxxxx)</td></tr>
+          <tr><td>Channel</td><td>SMS only — no WhatsApp, email, or push notifications in v1</td></tr>
+          <tr><td>Compliance</td><td>Platform must support opt-out handling (STOP). Clients responsible for contact list permission.</td></tr>
+          <tr><td>Budget</td><td>Infrastructure must remain cost-efficient — Railway + Vercel free/starter tiers where possible</td></tr>
+          <tr><td>Team</td><td>Single developer building and maintaining the platform initially</td></tr>
+          <tr><td>Timeline</td><td>MVP must be deployable within 6–8 weeks of development start</td></tr>
+        </tbody>
+      </table>
+
+      <!-- 10. TIMELINE -->
+      <h1 class="section-title section-anchor" id="timeline">10. High-Level Timeline</h1>
+      <table class="doc-table">
+        <thead><tr><th>Phase</th><th>Duration</th><th>Deliverables</th></tr></thead>
+        <tbody>
+          <tr><td>Phase 1 — Core Backend</td><td>Weeks 1–3</td><td>API server, Prisma schema, all API routes, BullMQ worker, Twilio integration, deployed on Railway</td></tr>
+          <tr><td>Phase 2 — Client Console</td><td>Weeks 4–5</td><td>Next.js console with Firebase auth, all pages (contacts, groups, campaigns, credits), deployed on Vercel</td></tr>
+          <tr><td>Phase 3 — Testing & Polish</td><td>Week 6</td><td>End-to-end testing with real Twilio numbers, both Dhiraagu and Ooredoo, fix delivery issues</td></tr>
+          <tr><td>Phase 4 — First Client</td><td>Week 7</td><td>Onboard first paying client, monitor closely, fix any production issues</td></tr>
+          <tr><td>Phase 5 — Iterate</td><td>Ongoing</td><td>Additional clients, feature requests, v1.1 planning</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-success">
+        <span class="callout-icon">✅</span>
+        <div class="callout-body">
+          <p class="callout-title">Current status</p>
+          <p class="callout-text">Phase 1 is underway. The API server is built and being tested. Railway Postgres and Redis are connected. Next step is completing Phase 1 testing, then moving to the Next.js console.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('.sidebar-link[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.sidebar-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('.section-anchor').forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

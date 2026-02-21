@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRD — SMSaaS Documentation</title>
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">
+    <div class="topbar-icon">💬</div>
+    <span class="topbar-name">SMSaaS</span>
+  </a>
+  <span class="topbar-product">Documentation</span>
+  <nav class="topbar-nav">
+    <a href="index.html" class="topbar-link">Overview</a>
+    <a href="brd.html" class="topbar-link">BRD</a>
+    <a href="frd.html" class="topbar-link active">FRD</a>
+    <a href="api.html" class="topbar-link">API Guide</a>
+    <a href="../index.html" class="topbar-link">← API Console</a>
+  </nav>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">FRD Contents</div>
+      <a href="#overview" class="sidebar-link active"><span class="dot"></span>1. Overview</a>
+      <a href="#auth" class="sidebar-link"><span class="dot"></span>2. Authentication</a>
+      <a href="#tenants" class="sidebar-link"><span class="dot"></span>3. Tenant Management</a>
+      <a href="#contacts" class="sidebar-link"><span class="dot"></span>4. Contact Management</a>
+      <a href="#groups" class="sidebar-link"><span class="dot"></span>5. Group Management</a>
+      <a href="#campaigns" class="sidebar-link"><span class="dot"></span>6. Campaigns</a>
+      <a href="#credits" class="sidebar-link"><span class="dot"></span>7. Credit System</a>
+      <a href="#worker" class="sidebar-link"><span class="dot"></span>8. SMS Worker</a>
+      <a href="#webhooks" class="sidebar-link"><span class="dot"></span>9. Webhooks</a>
+      <a href="#console" class="sidebar-link"><span class="dot"></span>10. Client Console</a>
+      <a href="#nonfunc" class="sidebar-link"><span class="dot"></span>11. Non-Functional Req.</a>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Other Documents</div>
+      <a href="index.html" class="sidebar-link"><span class="dot"></span>Product Overview</a>
+      <a href="brd.html" class="sidebar-link"><span class="dot"></span>Business Requirements</a>
+      <a href="api.html" class="sidebar-link"><span class="dot"></span>API Guide</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="content">
+
+      <div class="breadcrumb">
+        <a href="index.html">Docs</a>
+        <span class="breadcrumb-sep">›</span>
+        <span>Functional Requirements Document</span>
+      </div>
+
+      <div class="page-header">
+        <div class="page-eyebrow">⚙️ FRD</div>
+        <h1 class="page-title">Functional Requirements Document</h1>
+        <p class="page-subtitle">Detailed specification of every feature — inputs, outputs, business rules, and edge cases. Written so a developer can implement each requirement from scratch.</p>
+        <div class="page-meta">
+          <span class="meta-item"><strong>Version</strong> 1.0</span>
+          <span class="meta-item"><strong>Status</strong> <span class="badge badge-version">Draft</span></span>
+          <span class="meta-item"><strong>Date</strong> February 2026</span>
+        </div>
+      </div>
+
+      <div class="toc">
+        <div class="toc-title">Contents</div>
+        <ul class="toc-list">
+          <li><a href="#overview"><span class="toc-num">1</span>Overview & Conventions</a></li>
+          <li><a href="#auth"><span class="toc-num">2</span>Authentication & Security</a></li>
+          <li><a href="#tenants"><span class="toc-num">3</span>Tenant Management</a></li>
+          <li><a href="#contacts"><span class="toc-num">4</span>Contact Management</a></li>
+          <li><a href="#groups"><span class="toc-num">5</span>Group Management</a></li>
+          <li><a href="#campaigns"><span class="toc-num">6</span>Campaigns</a></li>
+          <li><a href="#credits"><span class="toc-num">7</span>Credit System</a></li>
+          <li><a href="#worker"><span class="toc-num">8</span>SMS Worker</a></li>
+          <li><a href="#webhooks"><span class="toc-num">9</span>Webhooks</a></li>
+          <li><a href="#console"><span class="toc-num">10</span>Client Console</a></li>
+          <li><a href="#nonfunc"><span class="toc-num">11</span>Non-Functional Requirements</a></li>
+        </ul>
+      </div>
+
+      <!-- 1 OVERVIEW -->
+      <h1 class="section-title section-anchor" id="overview">1. Overview & Conventions</h1>
+      <p>This document specifies the functional requirements for the SMSaaS platform v1.0. Each requirement is identified by a unique ID in the format <code>FR-[MODULE]-[NUMBER]</code>.</p>
+
+      <h2 class="subsection">Requirement priority levels</h2>
+      <table class="doc-table">
+        <thead><tr><th>Priority</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-req">MUST</span></td><td>Required for v1.0 launch. System is incomplete without this.</td></tr>
+          <tr><td><span class="badge badge-version">SHOULD</span></td><td>Strongly recommended. Omitting creates a degraded experience.</td></tr>
+          <tr><td><span class="badge badge-opt">COULD</span></td><td>Nice to have. Can be deferred to v1.1.</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="subsection">System components</h2>
+      <table class="doc-table">
+        <thead><tr><th>Component</th><th>Technology</th><th>Responsibility</th></tr></thead>
+        <tbody>
+          <tr><td>API Server</td><td>Node.js + Express + TypeScript</td><td>All business logic, REST endpoints, auth, credit management</td></tr>
+          <tr><td>Database</td><td>PostgreSQL via Prisma ORM</td><td>All persistent data — tenants, contacts, groups, campaigns, messages, credits</td></tr>
+          <tr><td>Queue</td><td>BullMQ + Redis</td><td>SMS job queue with retries, rate limiting, concurrency control</td></tr>
+          <tr><td>Worker</td><td>Node.js process (same codebase)</td><td>Reads queue, calls Twilio, updates message status</td></tr>
+          <tr><td>SMS Gateway</td><td>Twilio Messaging Service</td><td>Routes SMS to Dhiraagu and Ooredoo MV</td></tr>
+          <tr><td>Client Console</td><td>Next.js 14 + shadcn/ui + Firebase Auth</td><td>Frontend UI per tenant</td></tr>
+        </tbody>
+      </table>
+
+      <!-- 2 AUTH -->
+      <h1 class="section-title section-anchor" id="auth">2. Authentication & Security</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-AUTH-01</span>
+        <div class="req-content">
+          <div class="req-title">API Key Authentication <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">All tenant API endpoints must be protected by Bearer token authentication. The token is a 64-character hex string generated with <code>crypto.randomBytes(32).toString('hex')</code>. Requests without a valid token return <code>401 Unauthorized</code>.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-AUTH-02</span>
+        <div class="req-content">
+          <div class="req-title">Admin Authentication <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">All admin endpoints must require an <code>x-admin-secret</code> header matching the <code>ADMIN_SECRET</code> environment variable. Admin secret must be a minimum of 32 characters. Incorrect secret returns <code>401 Unauthorized</code>.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-AUTH-03</span>
+        <div class="req-content">
+          <div class="req-title">Tenant isolation <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Every database query on tenant-scoped resources must filter by <code>tenantId</code> derived from the authenticated API key. The <code>tenantId</code> from the request body must never be trusted. A tenant must never be able to access, modify, or view another tenant's data.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-AUTH-04</span>
+        <div class="req-content">
+          <div class="req-title">Inactive tenant blocking <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Tenants with <code>isActive = false</code> must receive <code>401 Unauthorized</code> on all API calls even if their API key is valid.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-AUTH-05</span>
+        <div class="req-content">
+          <div class="req-title">API key rotation <span class="badge badge-version">SHOULD</span></div>
+          <p class="req-desc">Admin must be able to generate a new API key for any tenant. The old key must be invalidated immediately. The new key is returned once in the response and not stored in plaintext.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-AUTH-06</span>
+        <div class="req-content">
+          <div class="req-title">Rate limiting <span class="badge badge-version">SHOULD</span></div>
+          <p class="req-desc">All API routes should be rate limited to 200 requests per minute per IP using <code>express-rate-limit</code>. Exceeded limits return <code>429 Too Many Requests</code>.</p>
+        </div>
+      </div>
+
+      <!-- 3 TENANTS -->
+      <h1 class="section-title section-anchor" id="tenants">3. Tenant Management</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-TEN-01</span>
+        <div class="req-content">
+          <div class="req-title">Create tenant <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Admin can create a tenant with: <code>name</code> (required), <code>email</code> (required, unique), <code>initialCredits</code> (optional, default 0). System generates a unique API key. Response includes the plain API key exactly once — it is never returned again.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-TEN-02</span>
+        <div class="req-content">
+          <div class="req-title">List tenants <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Admin can retrieve all tenants. Response includes: id, name, email, creditBalance, isActive, createdAt, and counts of contacts and campaigns. API key is never included in list responses.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-TEN-03</span>
+        <div class="req-content">
+          <div class="req-title">Toggle tenant status <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Admin can toggle a tenant's <code>isActive</code> status. Disabled tenants cannot access any API endpoints. Re-enabling restores full access.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-TEN-04</span>
+        <div class="req-content">
+          <div class="req-title">Top up credits <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Admin can add credits to a tenant account. Operation must be atomic — both the <code>creditBalance</code> increment and the <code>CreditLedger</code> entry must succeed or both must fail (database transaction).</p>
+        </div>
+      </div>
+
+      <!-- 4 CONTACTS -->
+      <h1 class="section-title section-anchor" id="contacts">4. Contact Management</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-CON-01</span>
+        <div class="req-content">
+          <div class="req-title">Phone number validation <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">All phone numbers must be normalised to E.164 format (<code>+9607xxxxxxx</code>) on create/update. Accepted input formats: <code>7xxxxxxx</code>, <code>+9607xxxxxxx</code>, <code>9607xxxxxxx</code>, <code>00960 7xxxxxxx</code> (with any spacing/dashes). Numbers that cannot resolve to a valid Maldivian mobile are rejected with a 400 error including a descriptive message.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-02</span>
+        <div class="req-content">
+          <div class="req-title">Duplicate prevention <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">A tenant cannot have two contacts with the same phone number. On create, if the number already exists for this tenant, the existing record is updated (upsert). This applies to both single-create and CSV import.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-03</span>
+        <div class="req-content">
+          <div class="req-title">CSV import <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Tenant can upload a CSV file. The file must be multipart/form-data, max 5MB. Accepted column headers (case-insensitive): name, phone/number, notes. Each row is validated independently. Response returns: <code>{ imported, skipped, errors[] }</code> where errors lists each invalid row with the reason. The import does not fail entirely if some rows are invalid.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-04</span>
+        <div class="req-content">
+          <div class="req-title">Contact deletion cascade <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Deleting a contact must remove it from all groups it belongs to via the GroupContact join table. Campaigns that have already sent to this contact are not affected — historical message records are preserved.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-05</span>
+        <div class="req-content">
+          <div class="req-title">Opt-out tracking <span class="badge badge-version">SHOULD</span></div>
+          <p class="req-desc">Contacts have an <code>optedOut</code> boolean field. Opted-out contacts must be excluded from campaign sends automatically. The system should eventually sync opt-outs from Twilio STOP replies.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-06</span>
+        <div class="req-content">
+          <div class="req-title">Search and pagination <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">The contact list endpoint must support: <code>?search=</code> (searches name and phone), <code>?page=</code>, <code>?limit=</code> (default 50, max 200). Response includes total count and page metadata.</p>
+        </div>
+      </div>
+
+      <!-- 5 GROUPS -->
+      <h1 class="section-title section-anchor" id="groups">5. Group Management</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-GRP-01</span>
+        <div class="req-content">
+          <div class="req-title">Create and manage groups <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Tenant can create groups with a unique name (per tenant). Group names must be non-empty strings. Tenant can rename and delete groups. Deleting a group does not delete the contacts — only the group and its membership records are removed.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-GRP-02</span>
+        <div class="req-content">
+          <div class="req-title">Add contacts to group <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Tenant can add multiple contacts to a group in one request by providing an array of contactIds. Only contacts belonging to the same tenant can be added. Duplicate adds (contact already in group) are silently ignored (<code>skipDuplicates: true</code>).</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-GRP-03</span>
+        <div class="req-content">
+          <div class="req-title">Group contact count <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">The group list endpoint must include a <code>_count.contacts</code> field showing how many contacts are in each group. This count is used by the console to estimate campaign size and credit cost before sending.</p>
+        </div>
+      </div>
+
+      <!-- 6 CAMPAIGNS -->
+      <h1 class="section-title section-anchor" id="campaigns">6. Campaigns</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-CAM-01</span>
+        <div class="req-content">
+          <div class="req-title">Pre-flight validation <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Before creating a campaign, the system must verify: (1) the group exists and belongs to this tenant, (2) the group has at least one eligible contact (not opted out), (3) the tenant has enough credits for the full campaign. Any failure returns a descriptive error with the specific reason.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CAM-02</span>
+        <div class="req-content">
+          <div class="req-title">Atomic campaign creation <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Campaign creation must be a single database transaction: (1) deduct credits from tenant, (2) create CreditLedger debit entry, (3) create Campaign record, (4) create one Message record per eligible contact. If any step fails, all steps are rolled back.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CAM-03</span>
+        <div class="req-content">
+          <div class="req-title">Credit calculation <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Credits required = <code>Math.ceil(message.length / 160) × eligibleContacts</code>. This calculation must use the actual message body, not an estimate. Unicode/emoji messages use 70 chars/segment — future enhancement; v1.0 uses 160 chars/segment for all messages.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CAM-04</span>
+        <div class="req-content">
+          <div class="req-title">Immediate queue dispatch <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">After the database transaction completes, all message jobs must be pushed to BullMQ using <code>addBulk()</code>. The API response must return before all jobs are processed — the endpoint is not synchronous. Response returns campaign ID, status (RUNNING), totalMessages, and creditsUsed.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CAM-05</span>
+        <div class="req-content">
+          <div class="req-title">Progress endpoint <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">A dedicated lightweight endpoint <code>GET /campaigns/:id/progress</code> must return: status, totalMessages, sentCount, failedCount, pending (calculated), and progressPercent (calculated). This endpoint is designed to be polled every 2–3 seconds from the console.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CAM-06</span>
+        <div class="req-content">
+          <div class="req-title">Campaign cancellation <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">A RUNNING campaign can be cancelled. Cancellation sets status to CANCELLED. The worker checks campaign status before processing each job — cancelled jobs are marked FAILED without calling Twilio. Unprocessed credits are refunded atomically: <code>refund = (total - sent - failed) × segments</code>.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CAM-07</span>
+        <div class="req-content">
+          <div class="req-title">Campaign completion detection <span class="badge badge-version">SHOULD</span></div>
+          <p class="req-desc">When a webhook updates a message status, the system should check if all messages in the campaign are now processed. If <code>sentCount + failedCount >= totalMessages</code> and status is RUNNING, update campaign status to COMPLETED and set completedAt.</p>
+        </div>
+      </div>
+
+      <!-- 7 CREDITS -->
+      <h1 class="section-title section-anchor" id="credits">7. Credit System</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-CRD-01</span>
+        <div class="req-content">
+          <div class="req-title">Pre-deduction model <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Credits must be deducted from the tenant balance before any messages are sent to Twilio. This prevents overspend even if the server crashes mid-campaign. The deduction is part of the atomic campaign creation transaction.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CRD-02</span>
+        <div class="req-content">
+          <div class="req-title">Automatic refund on message failure <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">When a message exhausts all retries and is marked as permanently FAILED, 1 credit must be refunded to the tenant's balance. Both the balance update and ledger entry must be atomic.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CRD-03</span>
+        <div class="req-content">
+          <div class="req-title">Full audit ledger <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Every credit change must create a <code>CreditLedger</code> record with: tenantId, amount (positive for credits, negative for debits), type (CREDIT/DEBIT/REFUND), reason (human-readable string), and timestamp. The ledger is append-only — records are never deleted or modified.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CRD-04</span>
+        <div class="req-content">
+          <div class="req-title">Balance can never go negative <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">The pre-flight credit check in FR-CAM-01 must prevent any campaign from launching when balance is insufficient. There is no overdraft facility in v1.0.</p>
+        </div>
+      </div>
+
+      <!-- 8 WORKER -->
+      <h1 class="section-title section-anchor" id="worker">8. SMS Worker</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-WRK-01</span>
+        <div class="req-content">
+          <div class="req-title">Separate persistent process <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">The SMS worker must run as a separate Node.js process from the API server. It connects to the same Redis and PostgreSQL instances. On Railway, it is deployed as a separate service with start command <code>npm run start:worker</code>.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-WRK-02</span>
+        <div class="req-content">
+          <div class="req-title">Concurrency and rate limiting <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Worker must process a maximum of 10 jobs concurrently. Rate limiter must cap sends at 100 messages per second to stay within Twilio's limits. Both settings must be configurable via environment variables.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-WRK-03</span>
+        <div class="req-content">
+          <div class="req-title">Retry with exponential backoff <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Failed jobs must be retried up to 3 times. Delays between retries: 2s, 4s, 8s (exponential backoff). After 3 failed attempts, the job is marked as permanently failed, the message record updated, and 1 credit refunded.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-WRK-04</span>
+        <div class="req-content">
+          <div class="req-title">Cancelled campaign check <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Before calling Twilio, the worker must check the campaign status from the database. If the campaign is CANCELLED, the message is marked FAILED without calling Twilio. No credit refund on this path — refund was handled at cancellation time.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-WRK-05</span>
+        <div class="req-content">
+          <div class="req-title">Twilio status callback URL <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Every Twilio message.create() call must include a <code>statusCallback</code> URL pointing to <code>{APP_URL}/api/v1/webhooks/twilio</code>. This is how delivery status updates are received.</p>
+        </div>
+      </div>
+
+      <!-- 9 WEBHOOKS -->
+      <h1 class="section-title section-anchor" id="webhooks">9. Webhooks</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-WHK-01</span>
+        <div class="req-content">
+          <div class="req-title">Twilio signature validation <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">All incoming webhook requests must be validated using Twilio's request signature (<code>twilio.validateRequest()</code>). Invalid signatures in production must return <code>403 Forbidden</code>. Validation can be skipped in development via <code>NODE_ENV</code> check.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-WHK-02</span>
+        <div class="req-content">
+          <div class="req-title">Status mapping <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Webhook receives Twilio's <code>MessageStatus</code> field. Must map to internal status: <code>sent → SENT</code>, <code>delivered → DELIVERED</code>, <code>failed → FAILED</code>, <code>undelivered → UNDELIVERED</code>. Unknown statuses are ignored. Error code and message are stored if present.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-WHK-03</span>
+        <div class="req-content">
+          <div class="req-title">Webhook URL format <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Webhook endpoint must accept application/x-www-form-urlencoded body (Twilio's format). The express body parser for this route must use <code>express.urlencoded</code>, not <code>express.json</code>. Using JSON parser on the webhook route breaks Twilio signature validation.</p>
+        </div>
+      </div>
+
+      <!-- 10 CONSOLE -->
+      <h1 class="section-title section-anchor" id="console">10. Client Console</h1>
+
+      <div class="req-item">
+        <span class="req-id">FR-CON-01</span>
+        <div class="req-content">
+          <div class="req-title">Firebase authentication <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Console uses Firebase Auth for login/logout. No custom auth backend is needed. The Firebase user session is used to gate access to the console UI. The API key to the SMS server is stored as a server-side environment variable and never exposed to the browser.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-02</span>
+        <div class="req-content">
+          <div class="req-title">Character counter on message compose <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">The campaign compose UI must show a live character counter and segment count. Must display: characters used, max per segment (160), number of segments, and estimated credit cost (segments × contact count).</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-03</span>
+        <div class="req-content">
+          <div class="req-title">Live campaign progress <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">After launching a campaign, the console must poll <code>GET /campaigns/:id/progress</code> every 2.5 seconds and display: a progress bar (%), sent count, failed count, pending count, and current status. Polling must automatically stop when campaign status is COMPLETED or CANCELLED.</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-04</span>
+        <div class="req-content">
+          <div class="req-title">Pages required <span class="badge badge-req">MUST</span></div>
+          <p class="req-desc">Console must include: Login, Dashboard (summary stats), Contacts (list, add, import, search), Groups (list, create, manage members), Campaigns (list, create, progress view), Credits (balance, ledger).</p>
+        </div>
+      </div>
+      <div class="req-item">
+        <span class="req-id">FR-CON-05</span>
+        <div class="req-content">
+          <div class="req-title">Responsive design <span class="badge badge-version">SHOULD</span></div>
+          <p class="req-desc">Console must be usable on mobile devices (tablets and phones). Key actions — checking campaign status, viewing credit balance — must be accessible without horizontal scrolling on screens ≥375px wide.</p>
+        </div>
+      </div>
+
+      <!-- 11 NON-FUNCTIONAL -->
+      <h1 class="section-title section-anchor" id="nonfunc">11. Non-Functional Requirements</h1>
+
+      <h2 class="subsection">Performance</h2>
+      <table class="doc-table">
+        <thead><tr><th>Requirement</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td>API response time (p95)</td><td>&lt; 300ms for all non-campaign endpoints</td></tr>
+          <tr><td>Campaign launch response time</td><td>&lt; 2s regardless of campaign size</td></tr>
+          <tr><td>SMS throughput</td><td>10,000 messages per minute minimum</td></tr>
+          <tr><td>Progress endpoint response</td><td>&lt; 100ms (lightweight query, no joins)</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="subsection">Reliability</h2>
+      <table class="doc-table">
+        <thead><tr><th>Requirement</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td>API server uptime</td><td>&gt; 99.5% monthly</td></tr>
+          <tr><td>Worker uptime</td><td>&gt; 99.5% monthly (Railway auto-restarts)</td></tr>
+          <tr><td>Zero message loss</td><td>If worker crashes, queued jobs must persist in Redis and resume on restart</td></tr>
+          <tr><td>Database integrity</td><td>All credit operations must use transactions — no partial updates</td></tr>
+        </tbody>
+      </table>
+
+      <h2 class="subsection">Security</h2>
+      <table class="doc-table">
+        <thead><tr><th>Requirement</th><th>Implementation</th></tr></thead>
+        <tbody>
+          <tr><td>API keys</td><td>64-char hex, generated with crypto.randomBytes — never stored plaintext after creation</td></tr>
+          <tr><td>Twilio webhook validation</td><td>Signature verified on every incoming webhook in production</td></tr>
+          <tr><td>Input validation</td><td>All request bodies validated with Zod — unknown fields rejected</td></tr>
+          <tr><td>CORS</td><td>Restricted to known console domains in production</td></tr>
+          <tr><td>Secrets management</td><td>All secrets via environment variables — never committed to git</td></tr>
+          <tr><td>HTTPS</td><td>Enforced by Railway and Vercel — HTTP redirected to HTTPS</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-info">
+        <span class="callout-icon">📎</span>
+        <div class="callout-body">
+          <p class="callout-title">See also</p>
+          <p class="callout-text">For API endpoint specifications including request/response formats, see the <a href="api.html" style="color:var(--brand)">API Guide</a>. For business context behind these requirements, see the <a href="brd.html" style="color:var(--brand)">BRD</a>.</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('.sidebar-link[href^="#"]');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.sidebar-link[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  document.querySelectorAll('.section-anchor').forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
