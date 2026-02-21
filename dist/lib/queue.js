@@ -7,22 +7,26 @@ exports.smsQueue = exports.redis = void 0;
 const bullmq_1 = require("bullmq");
 const ioredis_1 = __importDefault(require("ioredis"));
 const url_1 = require("url");
-const redisUrl = new url_1.URL(process.env.REDIS_URL);
+function parseRedisUrl(urlString) {
+    const url = new url_1.URL(urlString);
+    return {
+        host: url.hostname,
+        port: Number(url.port) || 6379,
+        password: url.password ? decodeURIComponent(url.password) : undefined,
+        username: url.username ? decodeURIComponent(url.username) : undefined,
+    };
+}
+const redisConfig = parseRedisUrl(process.env.REDIS_URL);
 exports.redis = new ioredis_1.default({
-    host: redisUrl.hostname,
-    port: Number(redisUrl.port),
-    password: redisUrl.password || undefined,
-    username: redisUrl.username || undefined,
+    ...redisConfig,
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
+    retryStrategy: (times) => Math.min(times * 500, 3000),
 });
+exports.redis.on("connect", () => console.log("✅ Redis connected"));
+exports.redis.on("error", (err) => console.error("Redis error:", err.message));
 exports.smsQueue = new bullmq_1.Queue("sms-jobs", {
-    connection: {
-        host: redisUrl.hostname,
-        port: Number(redisUrl.port),
-        password: redisUrl.password || undefined,
-        username: redisUrl.username || undefined,
-    },
+    connection: redisConfig,
     defaultJobOptions: {
         attempts: 3,
         backoff: {
