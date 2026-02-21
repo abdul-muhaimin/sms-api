@@ -6,19 +6,27 @@ import twilio from "twilio";
 import { URL } from "url";
 import { SmsJobData } from "../lib/queue";
 
-const redis = new IORedis(process.env.REDIS_URL!, {
+function parseRedisUrl(urlString: string) {
+  const url = new URL(urlString);
+  return {
+    host: url.hostname,
+    port: Number(url.port) || 6379,
+    password: url.password ? decodeURIComponent(url.password) : undefined,
+    username: url.username ? decodeURIComponent(url.username) : undefined,
+  };
+}
+
+const redisConfig = parseRedisUrl(process.env.REDIS_URL!);
+
+const redis = new IORedis({
+  ...redisConfig,
   maxRetriesPerRequest: null,
   enableReadyCheck: false,
+  retryStrategy: (times) => Math.min(times * 500, 3000),
 });
 
-// BullMQ expects its own connection object due to dependency duplication issues
-const redisUrl = new URL(process.env.REDIS_URL!);
-const bullmqRedisConnection = {
-  host: redisUrl.hostname,
-  port: Number(redisUrl.port),
-  password: redisUrl.password || undefined,
-  username: redisUrl.username || undefined,
-};
+redis.on("connect", () => console.log("✅ Worker Redis connected"));
+redis.on("error", (err) => console.error("Worker Redis error:", err.message));
 
 const prisma = new PrismaClient();
 const twilioClient = twilio(
@@ -26,81 +34,108 @@ const twilioClient = twilio(
   process.env.TWILIO_AUTH_TOKEN!,
 );
 
-const worker = new Worker<SmsJobData>(
-  "sms-jobs",
-  async (job: Job<SmsJobData>) => {
-    const { messageId, campaignId, phone, body } = job.data;
+async function processJob(job: Job<SmsJobData>): Promise<void> {
+  const { messageId, campaignId, phone, body } = job.data;
 
-    // Check if campaign was cancelled before processing
-    const campaign = await prisma.campaign.findUnique({
-      where: { id: campaignId },
-      select: { status: true },
-    });
+  // Check if campaign was cancelled before processing
+  const campaign = await prisma.campaign.findUnique({
+    where: { id: campaignId },
+    select: { status: true },
+  });
 
-    if (campaign?.status === "CANCELLED") {
-      await prisma.message.update({
-        where: { id: messageId },
-        data: { status: "FAILED", errorMessage: "Campaign cancelled" },
-      });
-      return;
-    }
-
-    const result = await twilioClient.messages.create({
-      body,
-      messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID!,
-      to: phone,
-      statusCallback: `${process.env.APP_URL}/api/v1/webhooks/twilio`,
-    });
-
+  if (campaign?.status === "CANCELLED") {
     await prisma.message.update({
       where: { id: messageId },
-      data: { status: "SENT", twilioSid: result.sid },
+      data: { status: "FAILED", errorMessage: "Campaign cancelled" },
     });
+    return;
+  }
 
-    await prisma.campaign.update({
-      where: { id: campaignId },
-      data: { sentCount: { increment: 1 } },
-    });
+  const result = await twilioClient.messages.create({
+    body,
+    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID!,
+    to: phone,
+    statusCallback: `${process.env.APP_URL}/api/v1/webhooks/twilio`,
+  });
+
+  console.log(`📱 Sent to ${phone} — SID: ${result.sid}`);
+
+  await prisma.message.update({
+    where: { id: messageId },
+    data: { status: "SENT", twilioSid: result.sid },
+  });
+
+  await prisma.campaign.update({
+    where: { id: campaignId },
+    data: { sentCount: { increment: 1 } },
+  });
+}
+
+const worker = new Worker<SmsJobData>("sms-jobs", processJob, {
+  connection: redisConfig,
+  concurrency: 10,
+  limiter: {
+    max: 100,
+    duration: 1000,
   },
-  {
-    connection: bullmqRedisConnection,
-    concurrency: 10,
-    limiter: { max: 100, duration: 1000 },
-  },
-);
+});
+
+worker.on("completed", (job) => {
+  console.log(`✅ Job ${job.id} completed — ${job.data.phone}`);
+});
 
 worker.on("failed", async (job, err) => {
   if (!job) return;
-  console.error(`❌ Job ${job.id} failed:`, err.message);
+  console.error(
+    `❌ Job ${job.id} failed (attempt ${job.attemptsMade}):`,
+    err.message,
+  );
 
-  // On final failure (no more retries), mark message as failed and refund credit
-  if (job.attemptsMade >= (job.opts.attempts ?? 3)) {
+  const maxAttempts = job.opts.attempts ?? 3;
+  if (job.attemptsMade >= maxAttempts) {
     const { messageId, campaignId, tenantId, phone } = job.data;
-    await prisma.$transaction([
-      prisma.message.update({
-        where: { id: messageId },
-        data: { status: "FAILED", errorMessage: err.message },
-      }),
-      prisma.campaign.update({
-        where: { id: campaignId },
-        data: { failedCount: { increment: 1 } },
-      }),
-      prisma.tenant.update({
-        where: { id: tenantId },
-        data: { creditBalance: { increment: 1 } },
-      }),
-      prisma.creditLedger.create({
-        data: {
-          tenantId,
-          amount: 1,
-          type: "REFUND",
-          reason: `Failed message refund: ${phone}`,
-        },
-      }),
-    ]);
+
+    try {
+      await prisma.$transaction([
+        prisma.message.update({
+          where: { id: messageId },
+          data: { status: "FAILED", errorMessage: err.message },
+        }),
+        prisma.campaign.update({
+          where: { id: campaignId },
+          data: { failedCount: { increment: 1 } },
+        }),
+        prisma.tenant.update({
+          where: { id: tenantId },
+          data: { creditBalance: { increment: 1 } },
+        }),
+        prisma.creditLedger.create({
+          data: {
+            tenantId,
+            amount: 1,
+            type: "REFUND",
+            reason: `Failed message refund: ${phone}`,
+          },
+        }),
+      ]);
+      console.log(`💰 Refunded 1 credit for failed message to ${phone}`);
+    } catch (refundErr) {
+      console.error("Failed to process refund:", refundErr);
+    }
   }
 });
 
-worker.on("completed", (job) => console.log(`✅ Job ${job.id} done`));
+worker.on("error", (err) => {
+  console.error("Worker error:", err.message);
+});
+
+// Graceful shutdown
+process.on("SIGTERM", async () => {
+  console.log("SIGTERM received — closing worker...");
+  await worker.close();
+  await redis.quit();
+  await prisma.$disconnect();
+  process.exit(0);
+});
 
 console.log("🚀 SMS Worker running...");
