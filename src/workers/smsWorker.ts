@@ -80,6 +80,10 @@ const worker = new Worker<SmsJobData>("sms-jobs", processJob, {
   },
 });
 
+// Log worker queue and Redis info
+console.log(`👂 Worker listening on queue: sms-jobs`);
+console.log(`👂 Redis: ${process.env.REDIS_URL?.split('@')[1]}`); // logs host without password
+
 worker.on("completed", (job) => {
   console.log(`✅ Job ${job.id} completed — ${job.data.phone}`);
 });

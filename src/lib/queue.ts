@@ -37,6 +37,8 @@ export const smsQueue = new Queue("sms-jobs", {
   },
 });
 
+smsQueue.on('waiting', (job) => console.log(`📥 Job waiting: ${job.id}`));
+
 export interface SmsJobData {
   messageId: string;
   campaignId: string;
