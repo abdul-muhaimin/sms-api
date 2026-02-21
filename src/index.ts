@@ -14,7 +14,7 @@ import webhooksRouter from "./routes/webhooks";
 import path from "path";
 
 const app = express();
-app.set("trust proxy", 1); // if behind a proxy (e.g. Heroku, Railway) for correct IP logging
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`🚀 API Server running on port ${PORT}`));
 
