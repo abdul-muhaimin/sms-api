@@ -82,7 +82,7 @@ const worker = new Worker<SmsJobData>("sms-jobs", processJob, {
 
 // Log worker queue and Redis info
 console.log(`👂 Worker listening on queue: sms-jobs`);
-console.log(`👂 Redis: ${process.env.REDIS_URL?.split('@')[1]}`); // logs host without password
+console.log(`👂 Redis: ${process.env.REDIS_URL?.split("@")[1]}`); // logs host without password
 
 worker.on("completed", (job) => {
   console.log(`✅ Job ${job.id} completed — ${job.data.phone}`);
@@ -142,4 +142,13 @@ process.on("SIGTERM", async () => {
   process.exit(0);
 });
 
-console.log("🚀 SMS Worker running...");
+
+// HTTP server so Railway doesn't kill the process
+import http from 'http';
+
+http.createServer((_, res) => {
+  res.writeHead(200);
+  res.end('ok');
+}).listen(process.env.PORT || 8080);
+
+console.log('🚀 SMS Worker running...');
